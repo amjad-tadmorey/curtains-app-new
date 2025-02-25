@@ -15,8 +15,8 @@ export default function Orders() {
         { header: "Delivery type", accessor: "delivery_type", isSortable: false },
         { header: "Sales man", accessor: "sales_man", isSortable: false },
         { header: "Show room", accessor: "show_room", isSortable: false },
-        { header: "Status", accessor: "status", isSortable: false },
-        { header: "View", accessor: "", isSortable: false },
+        // { header: "Status", accessor: "status", isSortable: false },
+        // { header: "View", accessor: "", isSortable: false },
     ];
 
     const rowStates = ["Active", "Inactive", "Archived"];
@@ -33,7 +33,7 @@ export default function Orders() {
                             <Button >Add Order +</Button>
                         </Modal.Open>
                         <Modal.Window position='top'>
-                            <AddOrderForm />
+                            <AddOrderForm close={close} />
                         </Modal.Window>
                     </Modal>
                 </div>
@@ -43,6 +43,7 @@ export default function Orders() {
                 data={orders}
                 rowStates={rowStates}
                 rowsPerPage={20} // Customize pagination
+                view="/orders/{id}" // ✅ Pass view URL pattern
             />
         </div>
     )

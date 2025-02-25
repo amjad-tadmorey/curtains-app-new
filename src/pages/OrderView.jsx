@@ -1,53 +1,103 @@
 import React, { useRef } from "react";
 import { useOrderById } from "../features/orders/useOrderById";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import html2pdf from "html2pdf.js";
+import { formatRails } from "../utils/helpers";
 
 export default function OrderView() {
+    function collectProducts(data) {
+        const { cleats, fabrics, accessories } = data;
+        return [...cleats, ...fabrics, ...accessories];
+    }
+
+
+
     const { order, isLoadingOrder } = useOrderById();
     const pdfRef = useRef();
 
     if (isLoadingOrder) return <p>Loading...</p>;
+    console.log(order);
 
-    // 🖨️ Function to Generate PDF
-    const handlePrint = async () => {
-        const element = pdfRef.current;
+    const handlePrint = () => {
+        if (!pdfRef.current) return;
+        console.log(pdfRef.current);
 
-        if (!element) return;
+        html2pdf()
+            .set({
+                margin: 5,
+                filename: `document.pdf`,
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+            })
+            .from(pdfRef.current)
+            .save();
+    };
 
-        const canvas = await html2canvas(element, {
-            backgroundColor: "#ffffff", // ✅ Force white background
-            useCORS: true, // ✅ Handle external images
-            scale: 2, // ✅ Higher resolution
+
+    function formatRailsQuantities(orderData) {
+        const grouped = {};
+
+        // Iterate over all rooms in the order
+        orderData.forEach(room => {
+            room.rails.forEach(item => {
+                const product = item.product;
+                const quantity = parseFloat(item.quantity);
+
+                if (!grouped[product]) {
+                    grouped[product] = {};
+                }
+
+                if (!grouped[product][quantity]) {
+                    grouped[product][quantity] = 1;
+                } else {
+                    grouped[product][quantity] += 1;
+                }
+            });
         });
 
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-        const imgWidth = 210; // A4 width in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        // Convert grouped data into an array of objects
+        return Object.entries(grouped).map(([product, quantities]) => ({
+            product,
+            details: Object.entries(quantities)
+                .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0])) // Sort by quantity descending
+                .map(([quantity, count]) => ({
+                    quantity: parseFloat(quantity).toFixed(2),
+                    count
+                }))
+        }));
+    }
 
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-        pdf.save(`order-${order.id}.pdf`);
-    };
+
+
+
+    console.log(formatRailsQuantities(order.rooms));
+
 
     return (
         <div dir="rtl" className="flex flex-col items-center p-6">
             {/* 🖨️ Print Button */}
             <button
                 onClick={handlePrint}
-                className="mb-4 px-4 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
+                className="mb-4 px-4 py-1 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
             >
                 طباعة الطلب 📄
             </button>
 
             {/* 📜 Order Content (PDF Target) */}
             <div
+                dir="rtl"
                 ref={pdfRef}
-                style={{ backgroundColor: "#ffffff", color: "#000", padding: "20px" }}
-                className="border rounded-xl shadow-md w-[75vw] mx-auto"
+                style={{
+                    backgroundColor: "#ffffff",
+                    color: "#000",
+                    padding: "20px",
+                    width: "700px",  /* Adjust based on A4 size */
+                    margin: "0 auto"
+                }}
+                className="border rounded-xl shadow-md"
             >
                 <div
-                    className="grid grid-cols-2 gap-4 border-b pb-4 mb-4"
+                    className="grid grid-cols-2 gap-4 border-b pb-2 mb-4"
                     style={{ borderBottom: "1px solid #ddd" }}
                 >
                     <div>
@@ -56,7 +106,7 @@ export default function OrderView() {
                         </h2>
                         <p><strong>الاسم:</strong> {order.customer_name}</p>
                         <p><strong>رقم الهاتف:</strong> {order.phone_number}</p>
-                        <p><strong>رقم الهاتف 2:</strong> {order.phone_number_2}</p>
+                        {order.phone_number_2 && <p><strong>رقم الهاتف 2:</strong> {order.phone_number_2}</p>}
                         <p><strong>العنوان:</strong> {order.address}</p>
                     </div>
                     <div>
@@ -67,11 +117,12 @@ export default function OrderView() {
                         <p><strong>مندوب المبيعات:</strong> {order.sales_man}</p>
                         <p><strong>نوع الطلب:</strong> {order.order_type}</p>
                         <p><strong>نوع التوصيل:</strong> {order.delivery_type}</p>
+                        {/* <p><strong> اسم الفني :</strong> {order.delivery_type}</p> */}
                     </div>
                 </div>
 
                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
-                    المنتجات
+                    المنتجات :
                 </h2>
                 <table className="w-full border-collapse border" style={{ borderColor: "#ddd" }}>
                     <thead>
@@ -94,60 +145,113 @@ export default function OrderView() {
                     </tbody>
                 </table>
 
+                {/* divisions */}
+                {
+                    formatRailsQuantities(order.rooms).length > 0 && <div className="mt-2 border-t pt-2" style={{ borderTop: "1px solid #ddd" }}>
+                        <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
+                            التقسيمات :
+                        </h2>
+                        {
+                            formatRailsQuantities(order.rooms).map(div => <div className="p-2 flex items-center gap-6 border-b pb-4" style={{ backgroundColor: "#f3f4f6" }}>
+                                <h1>{div.product}</h1>
+                                <div className="flex items-center">
+                                    {div.details.map((det) => <p className="mx-4 text-sm">--<span>{det.quantity} </span>  <span className="border pb-2 px-1">ع{det.count}</span>--</p>)}
+                                </div>
+                            </div>)
+                        }
+                    </div>
+                }
                 {/* 🏠 Rooms Section */}
                 {order.rooms.map((room, index) => (
-                    <div key={index} className="mt-6 border-t pt-4" style={{ borderTop: "1px solid #ddd" }}>
-                        <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
-                            الغرفة {index + 1}
-                        </h2>
+                    <>
+                        {/* <div className="page-break"></div> */}
+                        <div className="room-container">
+                            <div key={index} className="mt-6 border-t pt-4" style={{ borderTop: "1px solid #ddd" }}>
+                                <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
+                                    الغرفة {room.room_name}
+                                </h2>
 
-                        <div className="flex items-stretch justify-between gap-4">
-                            <div className="w-1/2">
-                                <table className="w-full border-collapse border mb-4" style={{ borderColor: "#ddd" }}>
-                                    <thead>
-                                        <tr style={{ backgroundColor: "#f3f4f6" }}>
-                                            <th className="border p-2" style={{ borderColor: "#ddd" }}>المنتج</th>
-                                            <th className="border p-2" style={{ borderColor: "#ddd" }}>الكمية</th>
-                                            <th className="border p-2" style={{ borderColor: "#ddd" }}>نوع التنفيذ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {room.fabrics.map((fabric, i) => (
-                                            <tr key={i}>
-                                                <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                                    {fabric.product}
-                                                </td>
-                                                <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                                    {fabric.quantity}
-                                                </td>
-                                                <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                                    {fabric.type}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* 🖼️ Room Images */}
-                            <div className="bg-gray-100 w-1/2 p-4 rounded-lg" style={{ backgroundColor: "#f3f4f6" }}>
-                                <div className="flex items-center justify-center gap-4">
-                                    {room.windows.map((window, i) => (
-                                        <div key={i} className="p-2 border rounded">
-                                            <img
-                                                src={window.src}
-                                                alt="Window"
-                                                className="w-24 h-24 object-contain"
-                                                style={{ border: "1px solid #ddd" }}
-                                            />
-                                            <p>العرض: {window.width} م</p>
-                                            <p>الارتفاع: {window.height} م</p>
+                                <div className="flex items-stretch justify-between gap-4">
+                                    <div className="w-1/2">
+                                        <div className="page-break">
+                                            <table className="w-full border-collapse border mb-4 " style={{ borderColor: "#ddd" }}>
+                                                <thead>
+                                                    <tr className="grid grid-cols-[1fr_8rem_4rem]" style={{ backgroundColor: "#f3f4f6" }}>
+                                                        <th className="border p-2" style={{ borderColor: "#ddd" }}>المنتج</th>
+                                                        <th className="border p-2" style={{ borderColor: "#ddd" }}>الكمية</th>
+                                                        <th className="border p-2" style={{ borderColor: "#ddd" }}>نوع</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {collectProducts(room).map((product, i) => (
+                                                        <tr className="grid grid-cols-[1fr_8rem_4rem]" key={i}>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.product}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.quantity}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.type}
+                                                            </td>
+                                                            {
+                                                                product.notes && <td className="p-2 col-span-3" style={{ background: "#ddd" }}>
+                                                                    {product.notes}
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    ))}
+                                                    {formatRails(room.rails).map((rail, i) => (
+                                                        <tr className="grid grid-cols-[1fr_8rem_4rem]" key={i}>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {rail.productName}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {rail.formattedQuantities}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {rail.type}
+                                                            </td>
+                                                            {
+                                                                rail.notes && <td className="p-2 col-span-3" style={{ background: "#ddd" }}>
+                                                                    {rail.notes}
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
                                         </div>
-                                    ))}
+                                    </div>
+
+                                    {/* 🖼️ Room Images */}
+                                    <div className=" w-1/2 p-4 rounded-lg" style={{ backgroundColor: "#f3f4f6" }}>
+                                        <div className="flex items-center justify-center flex-wrap gap-4">
+                                            {room?.windows?.map((window, i) => (
+                                                <div key={i} className="p-2 border rounded relative">
+                                                    <div className="flex items-center gap-4">
+                                                        <p>{window.width ? `${window.width} م` : "—"}</p>
+                                                        <p className="font-bold">{window.note || "—"}</p>
+                                                    </div>
+                                                    <img
+                                                        src={window.src || "/default-image.jpg"}
+                                                        alt="Window"
+                                                        className="w-24 h-24 object-contain m-[0.4rem] mx-[1.4rem]"
+                                                        style={{ border: "1px solid #ddd" }}
+                                                    />
+                                                    <p className="absolute left-2 bottom-2">{window.height ? `${window.height} م` : "—"}</p>
+                                                    <p>{window.type || "—"}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            <div>
+                                {room.remarks}
+                            </div>
                         </div>
-                    </div>
+                    </>
                 ))}
             </div>
         </div>

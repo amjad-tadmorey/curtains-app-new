@@ -94,7 +94,7 @@ const Window = ({
             </button>
 
             <div onClick={(e) => e.stopPropagation()}>
-                {isValidElement(children) ? cloneElement(children) : null}
+                {isValidElement(children) ? cloneElement(children, { close }) : null}
             </div>
         </div>
     );

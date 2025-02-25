@@ -1,7 +1,9 @@
 import { Controller } from 'react-hook-form'
 import Input from '../../ui/Input'
 import Select from '../../ui/Select'
+import MultipleInputs from '../../ui/MultipleInputs'
 import { useEffect } from 'react';
+import MultipleLabeledInputs from '../../ui/MultipleLabeledInputs';
 
 export default function Products({ methods, products }) {
     const watchedProducts = methods.watch("products");
@@ -10,7 +12,7 @@ export default function Products({ methods, products }) {
     }, [watchedProducts]);
     const handleAddProduct = () => {
         const currentProducts = methods.getValues('products') || [];
-        methods.setValue('products', [...currentProducts, { product: '', quantity: 0 }]);
+        methods.setValue('products', [...currentProducts, { product: '', quantity: null }]);
     };
 
     const handleDeleteProduct = (index) => {
@@ -18,10 +20,12 @@ export default function Products({ methods, products }) {
         const updatedProducts = currentProducts.filter((_, i) => i !== index);
         methods.setValue('products', updatedProducts);
     };
+
+
     return (
         <>
-            <div>
-                <h2>Products : </h2>
+            <div className='pb-4 border-b border-gray-300'>
+                <h2 className='text-xl font-bold mb-4'>Products : </h2>
 
                 <Controller
                     name="products"
@@ -34,7 +38,7 @@ export default function Products({ methods, products }) {
                                     <Select
                                         name={`products[${index}].product`}
                                         // options={products}
-                                        options={products.map(p => ({ value: p.productName, label: p.productName }))}
+                                        options={products.sort((a, b) => a.productName.localeCompare(b.productName, "ar")).map(p => ({ key: p.id, value: p.productName, label: p.productName }))}
                                         label="Select Product"
                                         required={true}
                                     />
@@ -63,24 +67,37 @@ export default function Products({ methods, products }) {
                 <button
                     type="button"
                     onClick={handleAddProduct}
-                    className="mt-4 px-4 py-2 bg-warning text-white rounded-md hover:bg-warning-hover transition-all cursor-pointer"
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-all cursor-pointer"
                 >
-                    Add Another Product
+
+                    + Add Product
                 </button>
             </div>
 
+
+            {/* division */}
+
+            {/* <div className='mt-12'>
+                <h2>Divisions : </h2>
+                <MultipleLabeledInputs name={'divisions'} />
+            </div> */}
+
             {/* Display Selected Products */}
-            <div className="mt-8">
-                <h2 className="font-bold text-lg">Selected Products:</h2>
-                <div className="space-y-4 mt-4">
-                    {watchedProducts && watchedProducts.map((item, index) => (
-                        <div key={index} className="flex justify-between p-2 border rounded-md">
-                            <span>Product: {item.product || 'Not selected'}</span>
-                            <span>Quantity: {item.quantity}</span>
-                        </div>
-                    ))}
+            {watchedProducts &&
+                <div className="my-8 pb-4 border-b border-gray-300">
+                    <h2 className="font-bold text-lg">Selected Products:</h2>
+                    <div className="space-y-4 mt-4">
+                        {watchedProducts.map((item, index) => (
+                            <div key={index} className="flex justify-between p-2 border rounded-md">
+                                <span>Product: {item.product || 'Not selected'}</span>
+                                <span>Quantity: {item.quantity}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            }
+
+
         </>
     )
 }

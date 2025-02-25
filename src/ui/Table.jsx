@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { FaEllipsisV } from "react-icons/fa";
+import { FaEllipsisV, FaEye } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Table = ({
     columns,
@@ -9,10 +10,12 @@ const Table = ({
     menuIcon = <FaEllipsisV />,
     shadow = "shadow-lg",
     rowsPerPage = 5,
+    view, // Optional: URL template for the view column
 }) => {
     const [sortConfig, setSortConfig] = useState({ key: "", direction: null });
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const navigate = useNavigate();
 
     const handleSort = (key) => {
         let direction = "asc";
@@ -49,6 +52,11 @@ const Table = ({
         setCurrentPage(page);
     };
 
+    const getViewUrl = (row) => {
+        if (!view) return "#";
+        return view.replace(/\{id\}/g, row.id); // Replace `{id}` with actual row ID
+    };
+
     return (
         <div className={`overflow-x-auto ${shadow} rounded-lg`}>
             <table className="min-w-full border-collapse bg-white rounded-lg">
@@ -75,6 +83,7 @@ const Table = ({
                                 </div>
                             </th>
                         ))}
+                        {view && <th className="py-4 px-6 text-center">View</th>}
                         <th className="py-4 px-6">Actions</th>
                     </tr>
                 </thead>
@@ -85,11 +94,21 @@ const Table = ({
                             className={`text-sm text-gray-700 ${rowIndex % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-200`}
                         >
                             {columns.map((column) => (
-                                <td key={`${rowIndex}-${column.accessor}`} className="py-4 px-6 border-t">
+                                <td key={`${rowIndex}-${column.accessor}`} className="py-4 px-6 border-t border-gray-300">
                                     {row[column.accessor]}
                                 </td>
                             ))}
-                            <td className="py-4 px-6 text-center border-t relative">
+                            {view && (
+                                <td className="py-4 px-6 text-center border-t border-gray-300">
+                                    <button
+                                        className="text-blue-600 hover:text-blue-800 transition-all"
+                                        onClick={() => navigate(getViewUrl(row))}
+                                    >
+                                        <FaEye />
+                                    </button>
+                                </td>
+                            )}
+                            <td className="py-4 px-6 text-center border-t border-gray-300 relative">
                                 <button
                                     className="text-gray-600 hover:text-blue-600 transition-all"
                                     onClick={() => setOpenMenuIndex(openMenuIndex === rowIndex ? null : rowIndex)}
@@ -115,7 +134,7 @@ const Table = ({
                 </tbody>
             </table>
 
-            <div className="flex justify-end items-center mt-4 pt-4 border-t bg-white">
+            <div className="flex justify-end items-center mt-4 pt-4 border-t border-gray-300 bg-white">
                 <button
                     className={`px-6 py-2 text-sm font-semibold ${currentPage === 1 ? "text-gray-400" : "text-blue-600"}`}
                     disabled={currentPage === 1}

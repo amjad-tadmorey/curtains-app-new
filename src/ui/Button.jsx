@@ -9,6 +9,7 @@ const Button = ({
     rounded = "md",
     borderColor,
     disabled,
+    className,
     ...props
 }) => {
     const baseStyles = "font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-white";
@@ -51,7 +52,7 @@ const Button = ({
 
     return (
         <button
-            className={`${baseStyles} ${variantStyles} ${sizeStyles} ${roundedStyles} ${borderStyles}`}
+            className={`${baseStyles} ${variantStyles} ${sizeStyles} ${roundedStyles} ${borderStyles} ${className}`}
             disabled={disabled || isLoading}
             {...props}
         >

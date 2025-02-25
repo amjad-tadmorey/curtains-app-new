@@ -39,6 +39,16 @@
 
 }
 
+html {
+  font-size: 75%;
+}
+
+.room-container {
+  /* page-break-before: c; */
+  page-break-inside: avoid;
+}
+
+
 :root {
   --color-primary: rgb(229, 42, 59) !important;
   --color-primary-hover: rgb(193, 32, 47) !important;
