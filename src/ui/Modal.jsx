@@ -88,7 +88,11 @@ const Window = ({
         >
             <button
                 className={`absolute cursor-pointer ${closeButtonPositionStyles[closeButtonPosition]} text-white bg-primary w-6 h-6 rounded-full`}
-                onClick={close}
+                onClick={() => {
+                    if (window.confirm('Are you sure you want to discard the order?')) {
+                        close(); // Only close if user confirms
+                    }
+                }}
             >
                 ×
             </button>

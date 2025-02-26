@@ -32,7 +32,7 @@ const Input = ({
                 type={type}
                 placeholder={placeholder}
                 {...register(name, validationRules)}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none ${transition ? "focus:ring-2 focus:ring-primary transition-all duration-200" : "focus:ring-0"
+                className={`w-full px-3 py-3 border rounded-md shadow-sm focus:outline-none ${transition ? "focus:ring-2 focus:ring-primary transition-all duration-200" : "focus:ring-0"
                     } ${errors[name] ? "border-red-500" : "border-gray-300"}`}
             />
             {errors[name] && (

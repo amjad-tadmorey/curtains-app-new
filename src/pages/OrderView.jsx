@@ -1,25 +1,14 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useOrderById } from "../features/orders/useOrderById";
 import html2pdf from "html2pdf.js";
 import { formatRails } from "../utils/helpers";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function OrderView() {
-    function collectProducts(data) {
-        const { cleats, fabrics, accessories } = data;
-        return [...cleats, ...fabrics, ...accessories];
-    }
-
-
-
-    const { order, isLoadingOrder } = useOrderById();
+    const queryClient = useQueryClient()
     const pdfRef = useRef();
-
-    if (isLoadingOrder) return <p>Loading...</p>;
-    console.log(order);
-
     const handlePrint = () => {
         if (!pdfRef.current) return;
-        console.log(pdfRef.current);
 
         html2pdf()
             .set({
@@ -34,12 +23,19 @@ export default function OrderView() {
     };
 
 
+    const { order, isLoadingOrder } = useOrderById();
+    useEffect(() => {
+        queryClient.invalidateQueries({ queryKey: [`order-${order?.id}`] })
+    }, [order])
+
+    if (isLoadingOrder) return <p>Loading...</p>;
+
     function formatRailsQuantities(orderData) {
         const grouped = {};
 
         // Iterate over all rooms in the order
-        orderData.forEach(room => {
-            room.rails.forEach(item => {
+        orderData?.forEach(room => {
+            room.rails?.forEach(item => {
                 const product = item.product;
                 const quantity = parseFloat(item.quantity);
 
@@ -68,11 +64,6 @@ export default function OrderView() {
     }
 
 
-
-
-    console.log(formatRailsQuantities(order.rooms));
-
-
     return (
         <div dir="rtl" className="flex flex-col items-center p-6">
             {/* 🖨️ Print Button */}
@@ -96,11 +87,12 @@ export default function OrderView() {
                 }}
                 className="border rounded-xl shadow-md"
             >
+                <img src="/Logo.png" alt="" className="w-56 p-2 mx-auto mb-4" />
                 <div
                     className="grid grid-cols-2 gap-4 border-b pb-2 mb-4"
                     style={{ borderBottom: "1px solid #ddd" }}
                 >
-                    <div>
+                    <div style={{ borderLeft: "1px solid #D1D5DB", padding: "4px" }}>
                         <h2 className="text-lg font-semibold" style={{ color: "#333" }}>
                             بيانات العميل
                         </h2>
@@ -108,8 +100,9 @@ export default function OrderView() {
                         <p><strong>رقم الهاتف:</strong> {order.phone_number}</p>
                         {order.phone_number_2 && <p><strong>رقم الهاتف 2:</strong> {order.phone_number_2}</p>}
                         <p><strong>العنوان:</strong> {order.address}</p>
+                        <p><strong>تاريخ التسليم :</strong> {order.delivery_date}</p>
                     </div>
-                    <div>
+                    <div style={{ borderLeft: "1px solid #D1D5DB", padding: "4px" }}>
                         <h2 className="text-lg font-semibold" style={{ color: "#333" }}>
                             تفاصيل الطلب
                         </h2>
@@ -117,7 +110,7 @@ export default function OrderView() {
                         <p><strong>مندوب المبيعات:</strong> {order.sales_man}</p>
                         <p><strong>نوع الطلب:</strong> {order.order_type}</p>
                         <p><strong>نوع التوصيل:</strong> {order.delivery_type}</p>
-                        {/* <p><strong> اسم الفني :</strong> {order.delivery_type}</p> */}
+                        <p><strong> اسم الفني :</strong> {order.technical}</p>
                     </div>
                 </div>
 
@@ -162,7 +155,7 @@ export default function OrderView() {
                     </div>
                 }
                 {/* 🏠 Rooms Section */}
-                {order.rooms.map((room, index) => (
+                {order?.rooms?.map((room, index) => (
                     <>
                         {/* <div className="page-break"></div> */}
                         <div className="room-container">
@@ -176,15 +169,19 @@ export default function OrderView() {
                                         <div className="page-break">
                                             <table className="w-full border-collapse border mb-4 " style={{ borderColor: "#ddd" }}>
                                                 <thead>
-                                                    <tr className="grid grid-cols-[1fr_8rem_4rem]" style={{ backgroundColor: "#f3f4f6" }}>
+                                                    <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" style={{ backgroundColor: "#f3f4f6" }}>
+                                                        <th className="border p-2" style={{ borderColor: "#ddd" }}>*</th>
                                                         <th className="border p-2" style={{ borderColor: "#ddd" }}>المنتج</th>
                                                         <th className="border p-2" style={{ borderColor: "#ddd" }}>الكمية</th>
                                                         <th className="border p-2" style={{ borderColor: "#ddd" }}>نوع</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {collectProducts(room).map((product, i) => (
-                                                        <tr className="grid grid-cols-[1fr_8rem_4rem]" key={i}>
+                                                    {room.fabrics.map((product, i) => (
+                                                        <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                قماش
+                                                            </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 {product.product}
                                                             </td>
@@ -195,14 +192,59 @@ export default function OrderView() {
                                                                 {product.type}
                                                             </td>
                                                             {
-                                                                product.notes && <td className="p-2 col-span-3" style={{ background: "#ddd" }}>
+                                                                product.notes && <td className="p-2 col-span-4" style={{ background: "#ddd" }}>
+                                                                    {product.notes}
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    ))}
+                                                    {room.cleats.map((product, i) => (
+                                                        <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                مرابط
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.product}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.quantity}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.type}
+                                                            </td>
+                                                            {
+                                                                product.notes && <td className="p-2 col-span-4" style={{ background: "#ddd" }}>
+                                                                    {product.notes}
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    ))}
+                                                    {room.accessories.map((product, i) => (
+                                                        <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                إكسسوار
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.product}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.quantity}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.type}
+                                                            </td>
+                                                            {
+                                                                product.notes && <td className="p-2 col-span-4" style={{ background: "#ddd" }}>
                                                                     {product.notes}
                                                                 </td>
                                                             }
                                                         </tr>
                                                     ))}
                                                     {formatRails(room.rails).map((rail, i) => (
-                                                        <tr className="grid grid-cols-[1fr_8rem_4rem]" key={i}>
+                                                        <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                سكك
+                                                            </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 {rail.productName}
                                                             </td>
@@ -213,7 +255,7 @@ export default function OrderView() {
                                                                 {rail.type}
                                                             </td>
                                                             {
-                                                                rail.notes && <td className="p-2 col-span-3" style={{ background: "#ddd" }}>
+                                                                rail.notes && <td className="p-2 col-span-4" style={{ background: "#ddd" }}>
                                                                     {rail.notes}
                                                                 </td>
                                                             }

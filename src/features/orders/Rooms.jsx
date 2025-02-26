@@ -27,7 +27,7 @@ const typeOptions = [ //'fabrics', 'cleats', 'accessories', 'rails'
     ]
 ];
 
-const windowShapes = Array.from({ length: 16 }, (_, i) => ({
+const windowShapes = Array.from({ length: 19 }, (_, i) => ({
     src: `/windows/shape-${i + 1}.svg`,
     imageId: i + 1,
 }));
@@ -81,52 +81,53 @@ export default function Rooms({ methods }) {
 
     return (
         <div className="pb-4 border-b border-gray-300">
-            <h2 className="text-xl font-bold mb-4">Rooms</h2>
+            <h2 className="text-xl font-bold mb-4">الغرف : </h2>
             <div>
                 {watchedRooms.map((room, roomIndex) => (
                     <div key={roomIndex} className="grid grid-cols-2 items-stretch border p-4 mb-4 rounded-lg gap-8 relative pt-24">
 
-                        <div className="absolute top-2 left-2 p-4 flex items-end gap-6">
-                            <Input equired={true} name={`rooms[${roomIndex}].room_name`} label="Room Name" type="text" />
-                            <button type="button" onClick={() => handleDeleteRoom(roomIndex)} className="text-danger text-sm mb-2 cursor-pointer text-nowrap">Delete Room</button>
+                        <div className="absolute top-2 right-2 p-4 flex items-end gap-6">
+                            <Input equired={true} name={`rooms[${roomIndex}].room_name`} label="إسم الغرفة" type="text" />
+                            <button type="button" onClick={() => handleDeleteRoom(roomIndex)} className="text-danger text-sm mb-2 cursor-pointer text-nowrap">حذف الغرفة  </button>
                         </div>
                         {/* Windows Section */}
+
+
+                        {/* Materials Section */}
+                        <div className=" max-h-[50vh] overflow-y-scroll">
+                            {[{ value: 'fabrics', name: 'أقمشة' }, { value: 'cleats', name: 'مرابط' }, { value: 'accessories', name: 'إكسسوار' }, { value: 'rails', name: 'سكك' },].map((category, i) => (
+                                <div key={category.value}>
+                                    <h4 className="font-medium mt-2">{category.name}</h4>
+                                    {room[category.value].map((_, itemIndex) => (
+                                        <div key={itemIndex} className="flex space-x-4 items-center">
+                                            <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.map(p => ({ value: p.product, label: p.product }))} label="إختر منتج" />
+                                            <Input required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].quantity`} label="الكمية" type="number" step="0.01" min="0" />
+                                            <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].type`} options={typeOptions[i]} label="النوع" />
+                                            <Input required={false} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].notes`} label="ملاحظات" type="text" />
+                                            <button type="button" onClick={() => handleDeleteItem(roomIndex, category.value, itemIndex)} className="text-red-500 cursor-pointer">×</button>
+                                        </div>
+                                    ))}
+                                    <button type="button" onClick={() => handleAddItem(roomIndex, category.value)} className="text-blue-500 cursor-pointer">+ أضف {category.name}</button>
+                                </div>
+                            ))}
+                        </div>
                         <div className=" bg-gray-100 rounded-lg p-8 max-h-[50vh] overflow-y-scroll">
-                            <h4 className="font-medium mb-2">Windows</h4>
+                            <h4 className="font-medium mb-2">النوافذ : </h4>
                             <button type="button" onClick={() => handleAddWindow(roomIndex)} className="bg-blue-500 text-white px-3 py-1 rounded-md mb-2">
-                                + Add Window
+                                + أضف نافذة
                             </button>
                             {room.windows.map((win, winIndex) => (
                                 <div key={winIndex} className="flex items-center gap-4 mb-2">
                                     <img src={win.src} alt={`Window ${win.imageId}`} className="w-16 h-16 border rounded" />
-                                    <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width`} label="Width" type="number" />
-                                    <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].height`} label="Height" type="number" />
-                                    <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].type`} label="Type" type="text" />
-                                    <Input required={false} name={`rooms[${roomIndex}].windows[${winIndex}].note`} label="Note" type="text" />
+                                    <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width`} label="العرض" type="number" />
+                                    <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].height`} label="الطول" type="number" />
+                                    <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].type`} label="النوع" type="text" />
+                                    <Input required={false} name={`rooms[${roomIndex}].windows[${winIndex}].note`} label="ملاحظات" type="text" />
                                     <button type="button" onClick={() => handleDeleteItem(roomIndex, 'windows', winIndex)} className="text-red-500 cursor-pointer">×</button>
                                 </div>
                             ))}
                         </div>
-
-                        {/* Materials Section */}
-                        <div className=" max-h-[50vh] overflow-y-scroll">
-                            {['fabrics', 'cleats', 'accessories', 'rails'].map((category, i) => (
-                                <div key={category}>
-                                    <h4 className="font-medium mt-2">{category.charAt(0).toUpperCase() + category.slice(1)}</h4>
-                                    {room[category].map((_, itemIndex) => (
-                                        <div key={itemIndex} className="flex space-x-4 items-center">
-                                            <Select required={true} name={`rooms[${roomIndex}].${category}[${itemIndex}].product`} options={watchedProducts.map(p => ({ value: p.product, label: p.product }))} label="Product Name" />
-                                            <Input required={true} name={`rooms[${roomIndex}].${category}[${itemIndex}].quantity`} label="Quantity" type="number" step="0.01" min="0" />
-                                            <Select required={true} name={`rooms[${roomIndex}].${category}[${itemIndex}].type`} options={typeOptions[i]} label="Type" />
-                                            <Input required={false} name={`rooms[${roomIndex}].${category}[${itemIndex}].notes`} label="Notes" type="text" />
-                                            <button type="button" onClick={() => handleDeleteItem(roomIndex, category, itemIndex)} className="text-red-500 cursor-pointer">×</button>
-                                        </div>
-                                    ))}
-                                    <button type="button" onClick={() => handleAddItem(roomIndex, category)} className="text-blue-500 cursor-pointer">+ Add {category.charAt(0).toUpperCase() + category.slice(1)}</button>
-                                </div>
-                            ))}
-                        </div>
-                        <Textarea required={false} name={`rooms[${roomIndex}].remarks`} label="Remarks" type="text" />
+                        <Textarea required={false} name={`rooms[${roomIndex}].remarks`} label="ملاحظات عامة" type="text" />
                     </div>
                 ))}
 
@@ -134,7 +135,7 @@ export default function Rooms({ methods }) {
             {isWindowPickerOpen && (
                 <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg max-w-lg">
-                        <h3 className="text-lg font-semibold mb-4">Select a Window</h3>
+                        <h3 className="text-lg font-semibold mb-4">إختر نافذة</h3>
                         <div className="grid grid-cols-4 gap-2">
                             {windowShapes.map(win => (
                                 <button key={win.imageId} onClick={() => handleSelectWindow(win.imageId)} className="border p-1 rounded-lg hover:bg-gray-200">
@@ -142,7 +143,7 @@ export default function Rooms({ methods }) {
                                 </button>
                             ))}
                         </div>
-                        <button onClick={() => setIsWindowPickerOpen(false)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md">Cancel</button>
+                        <button onClick={() => setIsWindowPickerOpen(false)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md">إلغاء</button>
                     </div>
                 </div>
             )}

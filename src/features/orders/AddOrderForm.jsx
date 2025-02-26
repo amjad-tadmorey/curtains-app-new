@@ -70,7 +70,6 @@ export default function AddOrderForm({ close }) {
 
 
     function onSubmit(data) {
-        console.log(data.order_type === 'خياطة' && data.rooms === undefined);
 
         if (data.order_type === 'خياطة' && data.rooms === undefined) return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
         if (data.order_type === 'خام') {
@@ -103,7 +102,7 @@ export default function AddOrderForm({ close }) {
 
     if (isLoading) return null
     return (
-        <div className='min-w-[95vw] h-[80vh] overflow-y-scroll px-8'>
+        <div dir='rtl' className='min-w-[95vw] h-[80vh] overflow-y-scroll px-8'>
             <h1 className='mb-8 border-b border-dark w-fit pr-12 pb-2 font-bold text-2xl'>Add Order</h1>
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)} className='px-4'>

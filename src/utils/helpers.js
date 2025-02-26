@@ -27,3 +27,8 @@ export function formatRails(data) {
         return { productName: product, formattedQuantities };
     });
 }
+
+export function collectProducts(data) {
+    const { cleats, fabrics, accessories } = data;
+    return [...cleats, ...fabrics, ...accessories];
+}

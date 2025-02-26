@@ -5,7 +5,7 @@ import { useParams } from "react-router";
 export function useOrderById() {
     const { orderId } = useParams()
     const { isLoading: isLoadingOrder, data: order } = useQuery({
-        queryKey: ['order'],
+        queryKey: [`order-${orderId}`],
         queryFn: () => getOrderById(orderId),
         retry: false
     })
