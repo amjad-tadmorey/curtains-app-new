@@ -4,6 +4,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast"
 import OrderView from "./pages/OrderView";
+import AppLayout from "./ui/AppLayout";
+import PageNotFound from "./pages/PageNotFound";
+import Accounts from "./pages/Accounts";
+import Products from "./pages/Products";
+import ProductView from "./pages/ProductView";
 
 function App() {
   const queryClient = new QueryClient({
@@ -40,9 +45,17 @@ function App() {
           }}
         />
         <Routes>
-          <Route path="/" element={<Orders />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/orders/:orderId" element={<OrderView />} />
+          <Route path="/" element={<AppLayout />}>
+            {/* <Route index element={<Dashboard />} /> */}
+            <Route index element={<Orders />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="orders/:orderId" element={<OrderView />} />
+            <Route path="products" element={<Products />} />
+            <Route path="products/:productId" element={<ProductView />} />
+            <Route path="accounts" element={<Accounts />} />
+            {/* <Route path="settings" element={<Settings />} /> */}
+            <Route path="*" element={<PageNotFound />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

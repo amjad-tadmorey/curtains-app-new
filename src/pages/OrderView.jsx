@@ -3,6 +3,12 @@ import { useOrderById } from "../features/orders/useOrderById";
 import html2pdf from "html2pdf.js";
 import { formatRails } from "../utils/helpers";
 import { useQueryClient } from "@tanstack/react-query";
+import Card from "../ui/Card";
+import { FaUser } from "react-icons/fa";
+import { CiCalendarDate } from "react-icons/ci";
+import { FiFileText } from "react-icons/fi";
+
+
 
 export default function OrderView() {
     const queryClient = useQueryClient()
@@ -87,56 +93,101 @@ export default function OrderView() {
                 }}
                 className="border rounded-xl shadow-md"
             >
-                <img src="/Logo.png" alt="" className="w-56 p-2 mx-auto mb-4" />
+                <div className="flex items-center justify-between mb-2 pb-2" style={{ borderBottom: "1px solid #ddd" }}>
+                    <img src="/Logo.png" alt="" className="w-56 p-2 mb-4" />
+                    {/* <h1 className="text-4xl font-bold">
+                        طلب قماش + خياطة
+                    </h1> */}
+                    <div>
+                        <div><CiCalendarDate style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /></div>
+                        <div>
+                            <div className="flex flex-col">
+                                <p> تاريخ التسليم</p>
+                                <p className="font-bold">{order.delivery_date}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div
-                    className="grid grid-cols-2 gap-4 border-b pb-2 mb-4"
+                    className="flex gap-4 border-b pb-2 mb-4 justify-between"
                     style={{ borderBottom: "1px solid #ddd" }}
                 >
-                    <div style={{ borderLeft: "1px solid #D1D5DB", padding: "4px" }}>
-                        <h2 className="text-lg font-semibold" style={{ color: "#333" }}>
-                            بيانات العميل
-                        </h2>
-                        <p><strong>الاسم:</strong> {order.customer_name}</p>
-                        <p><strong>رقم الهاتف:</strong> {order.phone_number}</p>
-                        {order.phone_number_2 && <p><strong>رقم الهاتف 2:</strong> {order.phone_number_2}</p>}
-                        <p><strong>العنوان:</strong> {order.address}</p>
-                        <p><strong>تاريخ التسليم :</strong> {order.delivery_date}</p>
-                    </div>
-                    <div style={{ borderLeft: "1px solid #D1D5DB", padding: "4px" }}>
-                        <h2 className="text-lg font-semibold" style={{ color: "#333" }}>
-                            تفاصيل الطلب
-                        </h2>
-                        <p><strong>المعرض:</strong> {order.show_room}</p>
-                        <p><strong>مندوب المبيعات:</strong> {order.sales_man}</p>
-                        <p><strong>نوع الطلب:</strong> {order.order_type}</p>
-                        <p><strong>نوع التوصيل:</strong> {order.delivery_type}</p>
-                        <p><strong> اسم الفني :</strong> {order.technical}</p>
-                    </div>
+                    <Card>
+                        <Card.Header><FaUser style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /> {order.customer_name}</Card.Header>
+                        <Card.Body>
+                            <div className="flex flex-col">
+                                <p>رقم الهاتف</p>
+                                <p className="font-bold">{order.phone_number}</p>
+                            </div>
+
+                            {order.phone_number_2 && <div className="flex flex-col">
+                                <p> رقم الهاتف - 2</p>
+                                <p className="font-bold">{order.phone_number_2}</p>
+                            </div>}
+                            {order.phone_number_3 && <div className="flex flex-col">
+                                <p> رقم الهاتف - 2</p>
+                                <p className="font-bold">{order.phone_number_3}</p>
+                            </div>}
+                            <hr className="col-span-3" />
+                            <div className="flex flex-col col-span-3">
+                                <p>العنوان</p>
+                                <p className="font-bold">{order.address}</p>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                    <Card>
+                        <Card.Header><FiFileText style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /> تفاصيل الطلب</Card.Header>
+                        <Card.Body>
+                            <div className="flex flex-col">
+                                <p>إسم الصالة</p>
+                                <p className="font-bold">{order.show_room}</p>
+                            </div>
+                            <div className="flex flex-col">
+                                <p>إسم البائع</p>
+                                <p className="font-bold">{order.sales_man}</p>
+                            </div>
+                            <div className="flex flex-col">
+                                <p>إسم الفني</p>
+                                <p className="font-bold">{order.technical}</p>
+                            </div>
+                            <hr className="col-span-3" />
+                            <div className="flex flex-col col">
+                                <p>نوع الأوردر</p>
+                                <p className="font-bold">{order.order_type}</p>
+                            </div>
+                            <div className="flex flex-col">
+                                <p>نوع التوصيل</p>
+                                <p className="font-bold">{order.delivery_type}</p>
+                            </div>
+                        </Card.Body>
+                    </Card>
                 </div>
 
                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
                     المنتجات :
                 </h2>
-                <table className="w-full border-collapse border" style={{ borderColor: "#ddd" }}>
-                    <thead>
-                        <tr style={{ backgroundColor: "#f3f4f6" }}>
-                            <th className="border p-2" style={{ borderColor: "#ddd" }}>المنتج</th>
-                            <th className="border p-2" style={{ borderColor: "#ddd" }}>الكمية</th>
+                <thead className="flex flex-col justify-between w-full mb-2">
+                    <tr className="border-y flex justify-between" style={{ borderColor: "#ddd" }}>
+                        <th className="p-2 text-start w-1/3">الكود</th>
+                        <th className="p-2 text-center w-1/3">المنتج</th>
+                        <th className="p-2 text-end w-1/3">الكمية</th>
+                    </tr>
+                </thead>
+                <tbody className="flex flex-col justify-between w-full">
+                    {order.products.map((product, index) => (
+                        <tr key={index} className="border rounded-lg my-1 flex justify-between" style={{ borderColor: "#ddd" }}>
+                            <td className="p-2 text-start w-1/3">
+                                {product.product.split("||")[1]}
+                            </td>
+                            <td className="p-2 text-center w-1/3">
+                                {product.product.split("||")[0]}
+                            </td>
+                            <td className="p-2 text-end w-1/3">
+                                {product.quantity}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {order.products.map((product, index) => (
-                            <tr key={index}>
-                                <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                    {product.product}
-                                </td>
-                                <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                    {product.quantity}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                    ))}
+                </tbody>
 
                 {/* divisions */}
                 {
@@ -146,7 +197,7 @@ export default function OrderView() {
                         </h2>
                         {
                             formatRailsQuantities(order.rooms).map(div => <div className="p-2 flex items-center gap-6 border-b pb-4" style={{ backgroundColor: "#f3f4f6" }}>
-                                <h1>{div.product}</h1>
+                                <h1 className="w-32">{div.product.split("||")[0]}</h1>
                                 <div className="flex items-center">
                                     {div.details.map((det) => <p className="mx-4 text-sm">--<span>{det.quantity} </span>  <span className="border pb-2 px-1">ع{det.count}</span>--</p>)}
                                 </div>
@@ -157,15 +208,14 @@ export default function OrderView() {
                 {/* 🏠 Rooms Section */}
                 {order?.rooms?.map((room, index) => (
                     <>
-                        {/* <div className="page-break"></div> */}
                         <div className="room-container">
                             <div key={index} className="mt-6 border-t pt-4" style={{ borderTop: "1px solid #ddd" }}>
                                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
                                     الغرفة {room.room_name}
                                 </h2>
 
-                                <div className="flex items-stretch justify-between gap-4">
-                                    <div className="w-1/2">
+                                <div className="flex items-stretch justify-between border-y py-2">
+                                    <div className="w-1/2 border-l pl-4">
                                         <div className="page-break">
                                             <table className="w-full border-collapse border mb-4 " style={{ borderColor: "#ddd" }}>
                                                 <thead>
@@ -183,7 +233,7 @@ export default function OrderView() {
                                                                 قماش
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                                                {product.product}
+                                                                {product.product.split("||")[0]}
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 {product.quantity}
@@ -204,7 +254,7 @@ export default function OrderView() {
                                                                 مرابط
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                                                {product.product}
+                                                                {product.product.split("||")[0]}
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 {product.quantity}
@@ -225,7 +275,7 @@ export default function OrderView() {
                                                                 إكسسوار
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                                                {product.product}
+                                                                {product.product.split("||")[0]}
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 {product.quantity}
@@ -246,7 +296,7 @@ export default function OrderView() {
                                                                 سكك
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
-                                                                {rail.productName}
+                                                                {rail.productName.split("||")[0]}
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 {rail.formattedQuantities}
@@ -267,21 +317,21 @@ export default function OrderView() {
                                     </div>
 
                                     {/* 🖼️ Room Images */}
-                                    <div className=" w-1/2 p-4 rounded-lg" style={{ backgroundColor: "#f3f4f6" }}>
-                                        <div className="flex items-center justify-center flex-wrap gap-4">
+                                    <div className=" w-1/2 p-4 rounded-lg">
+                                        <div className="flex items-center justify-start flex-wrap gap-4">
                                             {room?.windows?.map((window, i) => (
-                                                <div key={i} className="p-2 border rounded relative">
-                                                    <div className="flex items-center gap-4">
-                                                        <p>{window.width ? `${window.width} م` : "—"}</p>
-                                                        <p className="font-bold">{window.note || "—"}</p>
+                                                <div key={i} className="p-4 border rounded flex w-full">
+                                                    <div className="relative w-1/2">
+                                                        <p className="absolute left-24 translate-x-1/2 -top-3">{window.width ? `${window.width} ` : "—"}</p>
+                                                        <img
+                                                            src={window.src || "/default-image.jpg"}
+                                                            alt="Window"
+                                                            className="w-24 h-24 object-contain mt-4"
+                                                            style={{ border: "1px solid #ddd" }}
+                                                        />
+                                                        <p className="absolute left-10 bottom-1/2 translate-y-1/2">{window.height ? `${window.height} ` : "—"}</p>
                                                     </div>
-                                                    <img
-                                                        src={window.src || "/default-image.jpg"}
-                                                        alt="Window"
-                                                        className="w-24 h-24 object-contain m-[0.4rem] mx-[1.4rem]"
-                                                        style={{ border: "1px solid #ddd" }}
-                                                    />
-                                                    <p className="absolute left-2 bottom-2">{window.height ? `${window.height} م` : "—"}</p>
+                                                    <p className="font-bold w-1/2">{window.note || "—"}</p>
                                                     <p>{window.type || "—"}</p>
                                                 </div>
                                             ))}

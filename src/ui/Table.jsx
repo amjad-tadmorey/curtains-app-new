@@ -136,7 +136,7 @@ const Table = ({
 
             <div className="flex justify-end items-center mt-4 pt-4 border-t border-gray-300 bg-white">
                 <button
-                    className={`px-6 py-2 text-sm font-semibold ${currentPage === 1 ? "text-gray-400" : "text-blue-600"}`}
+                    className={`px-3 py-1 text-sm font-semibold bg-[#1E293B] rounded-lg m-2 text-white cursor-pointer ${currentPage === 1 ? "text-gray-400" : "text-[#101828]"}`}
                     disabled={currentPage === 1}
                     onClick={() => handlePageChange(currentPage - 1)}
                 >
@@ -146,7 +146,7 @@ const Table = ({
                     {[...Array(totalPages)].map((_, index) => (
                         <button
                             key={index}
-                            className={`px-4 py-2 text-sm ${currentPage === index + 1 ? "bg-blue-600 text-white" : "text-blue-600"} rounded-full hover:bg-blue-200`}
+                            className={`px-4 text-sm ${currentPage === index + 1 ? "bg-[#101828] text-white" : "text-[#101828]"} rounded-full hover:bg-[#1E293B] hover:text-white cursor-pointer`}
                             onClick={() => handlePageChange(index + 1)}
                         >
                             {index + 1}
@@ -154,7 +154,7 @@ const Table = ({
                     ))}
                 </div>
                 <button
-                    className={`px-6 py-2 text-sm font-semibold ${currentPage === totalPages ? "text-gray-400" : "text-blue-600"}`}
+                    className={`px-3 py-1 text-sm font-semibold bg-[#1E293B] rounded-lg m-2 text-white cursor-pointer ${currentPage === totalPages ? "text-gray-400" : "text-[#101828]"}`}
                     disabled={currentPage === totalPages}
                     onClick={() => handlePageChange(currentPage + 1)}
                 >

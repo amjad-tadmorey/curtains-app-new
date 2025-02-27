@@ -100,7 +100,7 @@ export default function Rooms({ methods }) {
                                     <h4 className="font-medium mt-2">{category.name}</h4>
                                     {room[category.value].map((_, itemIndex) => (
                                         <div key={itemIndex} className="flex space-x-4 items-center">
-                                            <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.map(p => ({ value: p.product, label: p.product }))} label="إختر منتج" />
+                                            <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.map(p => ({ value: p.product, label: p.product.split("||")[0] }))} label="إختر منتج" />
                                             <Input required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].quantity`} label="الكمية" type="number" step="0.01" min="0" />
                                             <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].type`} options={typeOptions[i]} label="النوع" />
                                             <Input required={false} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].notes`} label="ملاحظات" type="text" />

@@ -39,7 +39,7 @@ export default function Products({ methods, products }) {
                                     <Select
                                         name={`products[${index}].product`}
                                         // options={products}
-                                        options={products.sort((a, b) => a.productName.localeCompare(b.productName, "ar")).map(p => ({ key: p.id, value: p.productName, label: p.productName }))}
+                                        options={products.sort((a, b) => a.productName.localeCompare(b.productName, "ar")).map(p => ({ key: p.id, value: `${p.productName} || ${p.sapID}`, label: `${p.productName} || ${p.sapID}` }))}
                                         label="Select Product"
                                         required={true}
                                     />
