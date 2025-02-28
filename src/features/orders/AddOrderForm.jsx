@@ -8,6 +8,7 @@ import Rooms from './Rooms'
 import CuttOff from './CuttOff'
 import Button from '../../ui/Button'
 import toast from 'react-hot-toast'
+import { use } from 'react'
 
 
 export default function AddOrderForm({ close }) {
@@ -55,9 +56,9 @@ export default function AddOrderForm({ close }) {
             const used = usedQuantities[product] || 0;
 
             if (used > available) {
-                errors.push(`🚨 Product "${product}" is OVERUSED. Used: ${used.toFixed(2)}, Available: ${available.toFixed(2)}`);
+                errors.push(`🚨 Product "${product}" is OVERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
             } else if (used < available) {
-                errors.push(`⚠️ Product "${product}" is UNDERUSED. Used: ${used.toFixed(2)}, Available: ${available.toFixed(2)}`);
+                errors.push(`⚠️ Product "${product}" is UNDERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
             }
         });
 
