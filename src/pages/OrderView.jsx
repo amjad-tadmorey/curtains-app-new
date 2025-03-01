@@ -101,10 +101,6 @@ export default function OrderView() {
                     </h1> */}
 
                     <div className="flex items-center gap-4">
-
-
-                        <div><CiCalendarDate style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /></div>
-
                         <div>
                             <div><CiCalendarDate style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /></div>
                             <div>
