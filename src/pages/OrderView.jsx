@@ -96,10 +96,15 @@ export default function OrderView() {
             >
                 <div className="flex items-center justify-between mb-2 pb-2" style={{ borderBottom: "1px solid #ddd" }}>
                     <img src="/Logo.png" alt="" className="w-56 p-2 mb-4" />
-                    {/* <h1 className="text-4xl font-bold">
+                    {/* <h1 className="text-4xl font-bold flex-1 mr-16" style={{ color: "#333232" }}>
                         طلب قماش + خياطة
                     </h1> */}
+
                     <div className="flex items-center gap-4">
+
+
+                        <div><CiCalendarDate style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /></div>
+
                         <div>
                             <div><CiCalendarDate style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /></div>
                             <div>
@@ -176,7 +181,7 @@ export default function OrderView() {
                 </div>
 
                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
-                    المنتجات :
+                    طلب القماش :
                 </h2>
                 <thead className="flex flex-col justify-between w-full mb-2">
                     <tr className="border-y flex justify-between" style={{ borderColor: "#ddd" }}>
@@ -208,18 +213,22 @@ export default function OrderView() {
                             التقسيمات :
                         </h2>
                         {
-                            formatRailsQuantities(order.rooms).map(div => <div className="p-2 flex items-center gap-6 border-b pb-4" style={{ backgroundColor: "#f3f4f6" }}>
+                            formatRailsQuantities(order.rooms).map((div, i) => <div key={i} className="p-2 flex items-center gap-6 border-b pb-4" style={{ backgroundColor: "#f3f4f6" }}>
                                 <h1 className="w-32">{div.product.split("||")[0]}</h1>
                                 <div className="flex items-center">
-                                    {div.details.map((det) => <p className="mx-4 text-sm">--<span>{det.quantity} </span>  <span className="border pb-2 px-1">ع{det.count}</span>--</p>)}
+                                    {div.details.map((det, i) => <p key={i} className="mx-4 text-sm">--<span>{det.quantity} </span>  <span className="border pb-2 px-1">ع{det.count}</span>--</p>)}
                                 </div>
                             </div>)
                         }
                     </div>
                 }
                 {/* 🏠 Rooms Section */}
+                <h2 className="text-2xl font-semibold mb-2 my-4" style={{ color: "#333" }}>
+                    طلب الخياطة
+                </h2>
                 {order?.rooms?.map((room, index) => (
                     <>
+
                         <div className="room-container">
                             <div key={index} className="mt-6 border-t pt-4" style={{ borderTop: "1px solid #ddd" }}>
                                 <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>

@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 import { updateStock } from '../../services/productsApi'
 
 
+
 export default function AddOrderForm({ close }) {
 
     const { products, isLoading } = useProducts()
@@ -56,9 +57,9 @@ export default function AddOrderForm({ close }) {
             const used = usedQuantities[product] || 0;
 
             if (used > available) {
-                errors.push(`🚨 Product "${product}" is OVERUSED. Used: ${used.toFixed(2)}, Available: ${available.toFixed(2)}`);
+                errors.push(`🚨 Product "${product}" is OVERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
             } else if (used < available) {
-                errors.push(`⚠️ Product "${product}" is UNDERUSED. Used: ${used.toFixed(2)}, Available: ${available.toFixed(2)}`);
+                errors.push(`⚠️ Product "${product}" is UNDERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
             }
         });
 
