@@ -36,6 +36,15 @@
   --color-light-hover: #E2E6EA;
   /* Darker Light Gray */
 
+  --color-grey-1: #f7f5f5;
+  --color-grey-2: #BEC0CA;
+  --color-grey-3: #5E6366;
+  --color-grey-4: #53545C;
+  --color-green: #519C66;
+  --color-red: #CC5F5F;
+  --color-blue: #899df8;
+  --color-yellow: #949057;
+
 
 }
 
@@ -64,4 +73,42 @@ html {
   --color-dark-hover: rgb(35, 39, 43) !important;
   --color-light: rgb(248, 249, 250) !important;
   --color-light-hover: rgb(226, 230, 234) !important;
+  --color-grey-1: #f7f5f5 !important;
+  --color-grey-2: #BEC0CA !important;
+  --color-grey-3: #5E6366 !important;
+  --color-grey-4: #53545C !important;
+  --color-green: #519C66 !important;
+  --color-red: #CC5F5F !important;
+  --color-blue: #899df8 !important;
+  --color-yellow: #FFD700 !important;
+}
+
+.status-pending {
+  /* background-color: var(--color-success); */
+  color: var(--color-yellow);
+  font-weight: bold;
+}
+
+.status-in-progress {
+  /* background-color: var(--color-success); */
+  color: var(--color-blue);
+  font-weight: bold;
+}
+
+.status-completed {
+  /* background-color: var(--color-success); */
+  color: var(--color-green);
+  font-weight: bold;
+}
+
+.status-returned {
+  /* background-color: var(--color-success); */
+  color: var(--color-red);
+  font-weight: bold;
+}
+
+.status-closed {
+  /* background-color: var(--color-success); */
+  color: var(--color-dark);
+  font-weight: bold;
 }

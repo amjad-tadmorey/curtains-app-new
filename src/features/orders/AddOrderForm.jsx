@@ -8,6 +8,7 @@ import Rooms from './Rooms'
 import CuttOff from './CuttOff'
 import Button from '../../ui/Button'
 import toast from 'react-hot-toast'
+import { updateStock } from '../../services/productsApi'
 
 
 export default function AddOrderForm({ close }) {
@@ -69,34 +70,58 @@ export default function AddOrderForm({ close }) {
 
 
 
-    function onSubmit(data) {
+    function onSubmit(orderData) {
+        updateStock(orderData.products).then(data => {
+            if (data.state === false) {
+                return alert(data.error)
+            } else {
+                if (orderData.order_type === 'خياطة' && orderData.rooms === undefined) {
+                    return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
+                } else {
+                    console.log(data);
+                    if (orderData.order_type === "خام") {
+                        console.log("a");
+                        try {
+                            updateStock(orderData.products);
+                        } catch (e) {
+                            console.log(e);
+                        }
+                        addOrder({ ...orderData, status: 'pending' }, {
+                            onSuccess: () => {
+                                close()
+                                methods.reset()
+                                toast.success('The Order Successfuly Add ✔!')
+                            }
+                        });
+                    } else {
+                        const { products, rooms, cuttoff_materials } = orderData;
+                        const result = compareRoomQuantities(products, rooms, cuttoff_materials);
+                        if (!result.isValid) {
+                            // Display errors (You can use alert, console.log, or set state if using React)
+                            alert(result.errors.join("\n"));  // Show errors in an alert
+                            return; // Stop form submission if invalid
+                        }
+                        try {
+                            updateStock(orderData.products);
+                        } catch (e) {
+                            console.log(e);
 
-        if (data.order_type === 'خياطة' && data.rooms === undefined) return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
-        if (data.order_type === 'خام') {
-            addOrder(data, {
-                onSuccess: () => {
-                    close()
-                    methods.reset()
-                    toast.success('The Order Successfuly Add ✔!')
+                        }
+                        addOrder({ ...orderData, status: 'pending' }, {
+                            onSuccess: () => {
+                                close()
+                                methods.reset()
+                                toast.success('The Order Successfuly Add ✔!')
+                            }
+                        });
+                    }
                 }
-            });
-        } else {
-            const { products, rooms, cuttoff_materials } = data;
-            const result = compareRoomQuantities(products, rooms, cuttoff_materials);
-            if (!result.isValid) {
-                // Display errors (You can use alert, console.log, or set state if using React)
-                console.error("Quantity Errors:", result.errors);
-                alert(result.errors.join("\n"));  // Show errors in an alert
-                return; // Stop form submission if invalid
             }
-            addOrder(data, {
-                onSuccess: () => {
-                    close()
-                    methods.reset()
-                    toast.success('The Order Successfuly Add ✔!')
-                }
-            });
-        }
+        })
+
+
+
+
     }
 
 

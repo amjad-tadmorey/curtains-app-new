@@ -32,3 +32,9 @@ export function collectProducts(data) {
     const { cleats, fabrics, accessories } = data;
     return [...cleats, ...fabrics, ...accessories];
 }
+
+export function formatDate(dateString) {
+    const dateObject = new Date(dateString);
+    const formattedDate = dateObject.toISOString().split('T')[0];
+    return formattedDate
+}

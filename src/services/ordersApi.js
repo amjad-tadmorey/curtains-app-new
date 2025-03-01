@@ -37,3 +37,15 @@ export async function getOrderById(id) {
     }
     return order[0]
 }
+export async function changeStatus({ rowIndex, newState }) {
+    const { data: order, error } = await supabase
+        .from('orders')
+        .update({ status: newState })
+        .eq("id", rowIndex)
+        .select()
+    if (error) {
+        console.log(error);
+        throw new Error('status could not be updated')
+    }
+    return order[0]
+}

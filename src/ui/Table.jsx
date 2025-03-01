@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { FaEllipsisV, FaEye } from "react-icons/fa";
+import React, { useState, useMemo, useEffect } from "react";
+import { FaEllipsisV, FaEye, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Table = ({
@@ -25,17 +25,19 @@ const Table = ({
         setSortConfig({ key, direction });
     };
 
-    // Sorting logic applied before pagination
-    const sortedData = [...data].sort((a, b) => {
-        if (!sortConfig.key) return 0;
+    // Memoized sorting for better performance
+    const sortedData = useMemo(() => {
+        if (!sortConfig.key) return data;
 
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
+        return [...data].sort((a, b) => {
+            const aValue = a[sortConfig.key];
+            const bValue = b[sortConfig.key];
 
-        if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-    });
+            if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+            if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+            return 0;
+        });
+    }, [data, sortConfig]);
 
     // Pagination logic
     const indexOfLastRow = currentPage * rowsPerPage;
@@ -43,8 +45,13 @@ const Table = ({
     const currentRows = sortedData.slice(indexOfFirstRow, indexOfLastRow);
     const totalPages = Math.ceil(data.length / rowsPerPage);
 
-    const handleStateChange = (rowIndex, newState) => {
-        onRowStateChange(rowIndex, newState);
+    // Scroll to top when changing pages
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [currentPage]);
+
+    const handleStateChange = (rowProp, newState) => {
+        onRowStateChange(rowProp, newState);
         setOpenMenuIndex(null);
     };
 
@@ -52,10 +59,7 @@ const Table = ({
         setCurrentPage(page);
     };
 
-    const getViewUrl = (row) => {
-        if (!view) return "#";
-        return view.replace(/\{id\}/g, row.id); // Replace `{id}` with actual row ID
-    };
+    const getViewUrl = (row) => view ? view.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#";
 
     return (
         <div className={`overflow-x-auto ${shadow} rounded-lg`}>
@@ -73,11 +77,9 @@ const Table = ({
                                     <span>{column.header}</span>
                                     {column.isSortable && (
                                         <span className="ml-2 text-xs">
-                                            {sortConfig.key === column.accessor && sortConfig.direction === "asc"
-                                                ? "↑"
-                                                : sortConfig.key === column.accessor && sortConfig.direction === "desc"
-                                                    ? "↓"
-                                                    : ""}
+                                            {sortConfig.key === column.accessor ?
+                                                (sortConfig.direction === "asc" ? <FaSortUp /> : <FaSortDown />)
+                                                : <FaSort className="text-gray-400" />}
                                         </span>
                                     )}
                                 </div>
@@ -88,16 +90,23 @@ const Table = ({
                     </tr>
                 </thead>
                 <tbody>
-                    {currentRows.map((row, rowIndex) => (
+                    {currentRows.map((row) => (
                         <tr
-                            key={rowIndex}
-                            className={`text-sm text-gray-700 ${rowIndex % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-200`}
+                            key={row.id}
+                            className={`text-sm text-gray-700 ${row.id % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-200`}
                         >
-                            {columns.map((column) => (
-                                <td key={`${rowIndex}-${column.accessor}`} className="py-4 px-6 border-t border-gray-300">
-                                    {row[column.accessor]}
-                                </td>
-                            ))}
+                            {columns.map((column) => {
+                                const cellValue = row[column.accessor];
+
+                                // If column is "status", apply dynamic class
+                                const cellClass = column.accessor === "status" ? `status-${cellValue.toLowerCase().replace(/\s+/g, "-")}` : "";
+
+                                return (
+                                    <td key={`${row.id}-${column.accessor}`} className={`py-4 px-6 border-t border-gray-300 ${cellClass}`}>
+                                        {cellValue}
+                                    </td>
+                                );
+                            })}
                             {view && (
                                 <td className="py-4 px-6 text-center border-t border-gray-300">
                                     <button
@@ -111,17 +120,17 @@ const Table = ({
                             <td className="py-4 px-6 text-center border-t border-gray-300 relative">
                                 <button
                                     className="text-gray-600 hover:text-blue-600 transition-all"
-                                    onClick={() => setOpenMenuIndex(openMenuIndex === rowIndex ? null : rowIndex)}
+                                    onClick={() => setOpenMenuIndex(openMenuIndex === row.id ? null : row.id)}
                                 >
                                     {menuIcon}
                                 </button>
-                                {openMenuIndex === rowIndex && (
+                                {openMenuIndex === row.id && (
                                     <div className="absolute bg-white border rounded-lg shadow-md mt-1 right-0 w-40 z-10">
                                         {rowStates.map((state) => (
                                             <button
                                                 key={state}
                                                 className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-                                                onClick={() => handleStateChange(rowIndex, state)}
+                                                onClick={() => handleStateChange(row.id, state)}
                                             >
                                                 {state}
                                             </button>
@@ -136,7 +145,7 @@ const Table = ({
 
             <div className="flex justify-end items-center mt-4 pt-4 border-t border-gray-300 bg-white">
                 <button
-                    className={`px-3 py-1 text-sm font-semibold bg-[#1E293B] rounded-lg m-2 text-white cursor-pointer ${currentPage === 1 ? "text-gray-400" : "text-[#101828]"}`}
+                    className={`px-3 py-1 text-sm font-semibold bg-[#1E293B] rounded-lg m-2 text-white cursor-pointer ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={currentPage === 1}
                     onClick={() => handlePageChange(currentPage - 1)}
                 >
@@ -154,7 +163,7 @@ const Table = ({
                     ))}
                 </div>
                 <button
-                    className={`px-3 py-1 text-sm font-semibold bg-[#1E293B] rounded-lg m-2 text-white cursor-pointer ${currentPage === totalPages ? "text-gray-400" : "text-[#101828]"}`}
+                    className={`px-3 py-1 text-sm font-semibold bg-[#1E293B] rounded-lg m-2 text-white cursor-pointer ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={currentPage === totalPages}
                     onClick={() => handlePageChange(currentPage + 1)}
                 >

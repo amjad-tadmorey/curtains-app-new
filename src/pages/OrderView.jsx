@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useOrderById } from "../features/orders/useOrderById";
 import html2pdf from "html2pdf.js";
-import { formatRails } from "../utils/helpers";
+import { formatDate, formatRails } from "../utils/helpers";
 import { useQueryClient } from "@tanstack/react-query";
 import Card from "../ui/Card";
 import { FaUser } from "react-icons/fa";
@@ -68,6 +68,7 @@ export default function OrderView() {
                 }))
         }));
     }
+    console.log(order);
 
 
     return (
@@ -98,12 +99,23 @@ export default function OrderView() {
                     {/* <h1 className="text-4xl font-bold">
                         طلب قماش + خياطة
                     </h1> */}
-                    <div>
-                        <div><CiCalendarDate style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /></div>
+                    <div className="flex items-center gap-4">
                         <div>
-                            <div className="flex flex-col">
-                                <p> تاريخ التسليم</p>
-                                <p className="font-bold">{order.delivery_date}</p>
+                            <div><CiCalendarDate style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /></div>
+                            <div>
+                                <div className="flex flex-col">
+                                    <p> تاريخ التعاقد</p>
+                                    <p className="font-bold">{formatDate(order.created_at)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="border-r pr-8">
+                            <div><CiCalendarDate style={{ background: "#fff3e0" }} className="p-2 rounded-lg" size={30} /></div>
+                            <div>
+                                <div className="flex flex-col">
+                                    <p> تاريخ التسليم</p>
+                                    <p className="font-bold">{order.delivery_date}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
