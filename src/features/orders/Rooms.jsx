@@ -24,7 +24,13 @@ const typeOptions = [ //'fabrics', 'cleats', 'accessories', 'rails'
     ],
     [
         { value: "لايوجد", label: "لايوجد" }
-    ]
+    ],
+    [
+        { value: "لايوجد", label: "لايوجد" }
+    ],
+    [
+        { value: "لايوجد", label: "لايوجد" }
+    ],
 ];
 
 const windowShapes = Array.from({ length: 19 }, (_, i) => ({
@@ -43,7 +49,7 @@ export default function Rooms({ methods }) {
     }, [watchedRooms]);
 
     const handleAddRoom = () => {
-        methods.setValue("rooms", [...watchedRooms, { fabrics: [{}], cleats: [{}], accessories: [{}], rails: [{}], windows: [] }]);
+        methods.setValue("rooms", [...watchedRooms, { fabrics: [{}], cleats: [{}], accessories: [{}], rails: [{}], roll: [{}], oima: [{}], windows: [] }]);
     };
 
     const handleDeleteRoom = (roomIndex) => {
@@ -90,17 +96,22 @@ export default function Rooms({ methods }) {
                             <Input equired={true} name={`rooms[${roomIndex}].room_name`} label="إسم الغرفة" type="text" />
                             <button type="button" onClick={() => handleDeleteRoom(roomIndex)} className="text-danger text-sm mb-2 cursor-pointer text-nowrap">حذف الغرفة  </button>
                         </div>
-                        {/* Windows Section */}
-
 
                         {/* Materials Section */}
                         <div className=" max-h-[50vh] overflow-y-scroll">
-                            {[{ value: 'fabrics', name: 'أقمشة' }, { value: 'cleats', name: 'مرابط' }, { value: 'accessories', name: 'إكسسوار' }, { value: 'rails', name: 'سكك' },].map((category, i) => (
+                            {[
+                                { value: 'fabrics', name: 'أقمشة' },
+                                { value: 'cleats', name: 'مرابط' },
+                                { value: 'accessories', name: 'إكسسوار' },
+                                { value: 'rails', name: 'سكك' },
+                                { value: 'roll', name: 'رول' },
+                                { value: 'oima', name: 'أويمة' },
+                            ].map((category, i) => (
                                 <div key={category.value}>
                                     <h4 className="font-medium mt-2">{category.name}</h4>
-                                    {room[category.value].map((_, itemIndex) => (
+                                    {room[category.value]?.map((_, itemIndex) => (
                                         <div key={itemIndex} className="flex space-x-4 items-center">
-                                            <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.map(p => ({ value: p.product, label: p.product.split("||")[0] }))} label="إختر منتج" />
+                                            <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.filter(p => p.product.split("||")[3]?.trim() === category.value).map(p => ({ value: p.product, label: p.product.split("||")[0] }))} label="إختر منتج" />
                                             <Input required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].quantity`} label="الكمية" type="number" step="0.01" min="0" />
                                             <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].type`} options={typeOptions[i]} label="النوع" />
                                             <Input required={false} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].notes`} label="ملاحظات" type="text" />
@@ -111,6 +122,8 @@ export default function Rooms({ methods }) {
                                 </div>
                             ))}
                         </div>
+
+                        {/* Windows Section */}
                         <div className=" bg-gray-100 rounded-lg p-8 max-h-[50vh] overflow-y-scroll">
                             <h4 className="font-medium mb-2">النوافذ : </h4>
                             <button type="button" onClick={() => handleAddWindow(roomIndex)} className="bg-blue-500 text-white px-3 py-1 rounded-md mb-2">

@@ -25,7 +25,7 @@ export default function GeneralInfo() {
                 <Select name='sales_man' label="إسام البائع" required={true} options={
                     [
                         { key: 'عبد الرحمن اشمر', label: 'عبد الرحمن أشمر', value: 'عبد الرحمن أشمر' },
-                        { key: 'اسماء عبد المجيد', label: 'اسماء عبد المجيد', value: 'اسماء عبد المجيد' },
+                        { key: 'اسماء عبد الرؤوف', label: 'اسماء عبد الرؤوف', value: 'اسماء عبد الرؤوف' },
                         { key: 'زكريا أحمد', label: 'زكريا أحمد', value: 'زكريا أحمد' },
                         { key: 'رضوان الخطيب', label: 'رضوان الخطيب', value: 'رضوان الخطيب' },
                         { key: 'احمد عبد السلام', label: 'احمد عبد السلام', value: 'احمد عبد السلام' },

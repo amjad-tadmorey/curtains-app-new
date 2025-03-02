@@ -3,9 +3,8 @@ import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import Table from '../ui/Table';
 import { useProducts } from '../features/products/useProducts';
-import supabase from '../services/supabase';
 
-export default function Orders() {
+export default function Products() {
 
     const { products, isLoading } = useProducts()
 

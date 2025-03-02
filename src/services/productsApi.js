@@ -48,14 +48,14 @@ export async function updateStock(products) {
     const stockData = {};
 
     for (const { product, quantity } of products) {
-        const code = product.split(" || ")[1];
+        const code = product.split(" || ")[2];
         const qty = parseFloat(quantity);
 
         // Fetch the current stock
         const { data, error } = await supabase
             .from("products")
             .select("inStock")
-            .eq("sapID", code)
+            .eq("id", code)
             .single();
 
         if (error || !data) {
@@ -78,7 +78,7 @@ export async function updateStock(products) {
 
     // Step 3: Update stock for all products
     for (const { product, quantity } of products) {
-        const code = product.split(" || ")[1];
+        const code = product.split(" || ")[2];
         const qty = parseFloat(quantity);
 
         const newStock = stockData[code] - qty;
@@ -87,7 +87,7 @@ export async function updateStock(products) {
         const { error } = await supabase
             .from("products")
             .update({ inStock: newStock })
-            .eq("sapID", code);
+            .eq("id", code);
 
         if (error) {
             console.error(`Failed to update stock for ${code}`);

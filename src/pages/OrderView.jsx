@@ -244,7 +244,7 @@ export default function OrderView() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {room.fabrics.map((product, i) => (
+                                                    {room?.fabrics?.map((product, i) => (
                                                         <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 قماش
@@ -265,7 +265,7 @@ export default function OrderView() {
                                                             }
                                                         </tr>
                                                     ))}
-                                                    {room.cleats.map((product, i) => (
+                                                    {room?.cleats?.map((product, i) => (
                                                         <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 مرابط
@@ -286,10 +286,52 @@ export default function OrderView() {
                                                             }
                                                         </tr>
                                                     ))}
-                                                    {room.accessories.map((product, i) => (
+                                                    {room?.accessories?.map((product, i) => (
                                                         <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 إكسسوار
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.product.split("||")[0]}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.quantity}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.type}
+                                                            </td>
+                                                            {
+                                                                product.notes && <td className="p-2 col-span-4" style={{ background: "#ddd" }}>
+                                                                    {product.notes}
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    ))}
+                                                    {room?.roll?.map((product, i) => (
+                                                        <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                رول
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.product.split("||")[0]}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.quantity}
+                                                            </td>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                {product.type}
+                                                            </td>
+                                                            {
+                                                                product.notes && <td className="p-2 col-span-4" style={{ background: "#ddd" }}>
+                                                                    {product.notes}
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    ))}
+                                                    {room?.oima?.map((product, i) => (
+                                                        <tr className="grid grid-cols-[5rem_1fr_8rem_4rem]" key={i} style={{ border: "1px solid #797878" }}>
+                                                            <td className="border p-2" style={{ borderColor: "#ddd" }}>
+                                                                أويمة
                                                             </td>
                                                             <td className="border p-2" style={{ borderColor: "#ddd" }}>
                                                                 {product.product.split("||")[0]}

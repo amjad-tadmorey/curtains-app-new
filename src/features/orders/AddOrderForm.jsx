@@ -8,12 +8,10 @@ import Rooms from './Rooms'
 import CuttOff from './CuttOff'
 import Button from '../../ui/Button'
 import toast from 'react-hot-toast'
-import { updateStock } from '../../services/productsApi'
 
 
 
 export default function AddOrderForm({ close }) {
-
     const { products, isLoading } = useProducts()
     const { addOrder } = useAddOrder()
     const methods = useForm();
@@ -57,9 +55,9 @@ export default function AddOrderForm({ close }) {
             const used = usedQuantities[product] || 0;
 
             if (used > available) {
-                errors.push(`🚨 Product "${product}" is OVERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
+                errors.push(`🚨 Product "${product.split(" || ")[0]}" is OVERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
             } else if (used < available) {
-                errors.push(`⚠️ Product "${product}" is UNDERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
+                errors.push(`⚠️ Product "${product.split(" || ")[0]}" is UNDERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
             }
         });
 
@@ -72,57 +70,31 @@ export default function AddOrderForm({ close }) {
 
 
     function onSubmit(orderData) {
-        updateStock(orderData.products).then(data => {
-            if (data.state === false) {
-                return alert(data.error)
-            } else {
-                if (orderData.order_type === 'خياطة' && orderData.rooms === undefined) {
-                    return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
-                } else {
-                    console.log(data);
-                    if (orderData.order_type === "خام") {
-                        console.log("a");
-                        try {
-                            updateStock(orderData.products);
-                        } catch (e) {
-                            console.log(e);
-                        }
-                        addOrder({ ...orderData, status: 'pending' }, {
-                            onSuccess: () => {
-                                close()
-                                methods.reset()
-                                toast.success('The Order Successfuly Add ✔!')
-                            }
-                        });
-                    } else {
-                        const { products, rooms, cuttoff_materials } = orderData;
-                        const result = compareRoomQuantities(products, rooms, cuttoff_materials);
-                        if (!result.isValid) {
-                            // Display errors (You can use alert, console.log, or set state if using React)
-                            alert(result.errors.join("\n"));  // Show errors in an alert
-                            return; // Stop form submission if invalid
-                        }
-                        try {
-                            updateStock(orderData.products);
-                        } catch (e) {
-                            console.log(e);
-
-                        }
-                        addOrder({ ...orderData, status: 'pending' }, {
-                            onSuccess: () => {
-                                close()
-                                methods.reset()
-                                toast.success('The Order Successfuly Add ✔!')
-                            }
-                        });
-                    }
+        if (orderData.order_type === 'خياطة' && orderData.rooms === undefined) return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
+        if (orderData.order_type === "خام") {
+            addOrder({ ...orderData, status: 'pending' }, {
+                onSuccess: () => {
+                    close()
+                    methods.reset()
+                    toast.success('The Order Successfuly Add ✔!')
                 }
+            });
+        } else {
+            const { products, rooms, cuttoff_materials } = orderData;
+            const result = compareRoomQuantities(products, rooms, cuttoff_materials);
+            if (!result.isValid) {
+                // Display errors (You can use alert, console.log, or set state if using React)
+                alert(result.errors.join("\n"));  // Show errors in an alert
+                return; // Stop form submission if invalid
             }
-        })
-
-
-
-
+            addOrder({ ...orderData, status: 'pending' }, {
+                onSuccess: () => {
+                    close()
+                    methods.reset()
+                    toast.success('The Order Successfuly Add ✔!')
+                }
+            });
+        }
     }
 
 
