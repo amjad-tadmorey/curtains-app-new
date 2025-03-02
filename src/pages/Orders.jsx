@@ -6,6 +6,7 @@ import AddOrderForm from '../features/orders/AddOrderForm';
 import { useOrders } from '../features/orders/useOrders'
 import { useChangeStatus } from '../features/orders/useChangeStatus';
 import { useQueryClient } from '@tanstack/react-query';
+import Spinner from '../ui/Spinner';
 
 export default function Orders() {
     const queryClient = useQueryClient()
@@ -26,7 +27,7 @@ export default function Orders() {
 
     const rowStates = ["in-progress", "completed", "closed", "returned"];
 
-    if (isLoading) return null
+    if (isLoading) return <Spinner />
 
     function onRowStateChange(rowIndex, newState) {
         changeStatus({ rowIndex, newState }, {

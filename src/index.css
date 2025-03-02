@@ -112,3 +112,21 @@ html {
   color: var(--color-dark);
   font-weight: bold;
 }
+
+
+
+@keyframes spinner {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.spinner {
+  margin: 4.8rem auto;
+  width: 6.4rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(farthest-side, #e52a3b 94%, rgba(0, 0, 0, 0)) top/10px 10px no-repeat, conic-gradient(rgba(0, 0, 0, 0) 30%, #e52a3b);
+  -webkit-mask: radial-gradient(farthest-side, rgba(0, 0, 0, 0) calc(100% - 10px), #000 0);
+  animation: spinner 1.5s infinite;
+}

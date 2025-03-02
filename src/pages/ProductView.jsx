@@ -3,9 +3,21 @@ import { useProductById } from '../features/products/useProductById';
 import { useQueryClient } from '@tanstack/react-query';
 import Card from '../ui/Card';
 import { FaBox, FaDollarSign, FaInfoCircle } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProductView() {
     const queryClient = useQueryClient()
+
+    const navigate = useNavigate()
+    useEffect(() => {
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                navigate('/products')
+                // Perform your action here
+            }
+        });
+
+    }, [])
 
     const { product, isLoadingProduct } = useProductById();
     useEffect(() => {

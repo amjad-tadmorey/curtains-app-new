@@ -7,10 +7,23 @@ import Card from "../ui/Card";
 import { FaUser } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
 import { FiFileText } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 
 
 export default function OrderView() {
+    const navigate = useNavigate()
+    useEffect(() => {
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                navigate('/orders')
+                // Perform your action here
+            }
+        });
+
+    }, [])
+
+
     const queryClient = useQueryClient()
     const pdfRef = useRef();
     const handlePrint = () => {
@@ -78,7 +91,7 @@ export default function OrderView() {
                 onClick={handlePrint}
                 className="mb-4 px-4 py-1 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
             >
-                طباعة الطلب 📄
+                حفظ الطلب 📄
             </button>
 
             {/* 📜 Order Content (PDF Target) */}
@@ -176,8 +189,8 @@ export default function OrderView() {
                     </Card>
                 </div>
 
-                <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
-                    طلب القماش :
+                <h2 className="text-lg font-semibold mb-2 text-center" style={{ color: "#333" }}>
+                    طلب القماش
                 </h2>
                 <thead className="flex flex-col justify-between w-full mb-2">
                     <tr className="border-y flex justify-between" style={{ borderColor: "#ddd" }}>
@@ -219,17 +232,20 @@ export default function OrderView() {
                     </div>
                 }
                 {/* 🏠 Rooms Section */}
-                <h2 className="text-2xl font-semibold mb-2 my-4" style={{ color: "#333" }}>
-                    طلب الخياطة
-                </h2>
+
                 {order?.rooms?.map((room, index) => (
                     <>
-
                         <div className="room-container">
                             <div key={index} className="mt-6 border-t pt-4" style={{ borderTop: "1px solid #ddd" }}>
-                                <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
-                                    الغرفة {room.room_name}
-                                </h2>
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>
+                                        الغرفة : {room.room_name}
+                                    </h2>
+                                    <h2 className="text-xl font-semibold mb-2 my-4 text-center" style={{ color: "#333" }}>
+                                        طلب خياطة
+                                    </h2>
+                                    <h2 className="text-lg font-semibold mb-2" style={{ color: "#333" }}>العميل : {order.customer_name}</h2>
+                                </div>
 
                                 <div className="flex items-stretch justify-between border-y py-2">
                                     <div className="w-1/2 border-l pl-4">
@@ -402,8 +418,11 @@ export default function OrderView() {
                                 {room.remarks}
                             </div>
                         </div>
+
+                        <h1 className=" text-xl font-semibold mt-2">{index === order?.rooms?.length - 1 ? "" : "يتبع..."}</h1>
                     </>
                 ))}
+                <h1 className="text-center text-2xl font-bold mt-12">انتهى الاوردر</h1>
             </div>
         </div>
     );

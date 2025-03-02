@@ -3,6 +3,7 @@ import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import Table from '../ui/Table';
 import { useProducts } from '../features/products/useProducts';
+import Spinner from '../ui/Spinner';
 
 export default function Products() {
 
@@ -17,7 +18,7 @@ export default function Products() {
 
     const rowStates = ["Active", "Inactive", "Archived"];
 
-    if (isLoading) return null
+    if (isLoading) return <Spinner />
 
     return (
         <div className="p-12">

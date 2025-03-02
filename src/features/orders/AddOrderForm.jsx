@@ -8,7 +8,7 @@ import Rooms from './Rooms'
 import CuttOff from './CuttOff'
 import Button from '../../ui/Button'
 import toast from 'react-hot-toast'
-
+import Spinner from '../../ui/Spinner'
 
 
 export default function AddOrderForm({ close }) {
@@ -98,7 +98,7 @@ export default function AddOrderForm({ close }) {
     }
 
 
-    if (isLoading) return null
+    if (isLoading) return <Spinner />
     return (
         <div dir='rtl' className='min-w-[95vw] h-[80vh] overflow-y-scroll px-8'>
             <h1 className='mb-8 border-b border-dark w-fit pr-12 pb-2 font-bold text-2xl'>Add Order</h1>
