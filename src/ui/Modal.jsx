@@ -40,6 +40,7 @@ const Open = ({ children, opens }) => {
 
 // Window component to display modal content
 const Window = ({
+    setEditId,
     name,
     children,
     shape = "rounded",
@@ -49,48 +50,39 @@ const Window = ({
     closeButtonPosition = "top-right"
 }) => {
     const context = useContext(ModalContext);
-    if (!context) return null;
-    const { openName, close } = context;
+    const isControlled = !!context; // Check if inside ModalContext
+    const [isOpen, setIsOpen] = useState(!isControlled); // Default open if uncontrolled
 
-    if (name !== openName) return null;
+    const { openName, close } = context || {}; // Get context values or undefined
 
-    const shapeStyles = {
-        square: "rounded-none",
-        rounded: "rounded-lg",
-        pill: "rounded-full",
-    };
+    // Determine if the modal should be shown
+    const shouldShow = isControlled ? openName === name : isOpen;
 
-    const positionStyles = {
-        center: "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2",
-        top: "top-20 left-1/2 transform -translate-x-1/2",
-        bottom: "bottom-20 left-1/2 transform -translate-x-1/2",
-    };
+    if (!shouldShow) return null;
 
-    const shadowStyles = {
-        none: "shadow-none",
-        sm: "shadow-sm",
-        md: "shadow-md",
-        lg: "shadow-lg",
-        xl: "shadow-xl",
-    };
-
-    const closeButtonPositionStyles = {
-        "top-left": "top-4 left-4",
-        "top-right": "top-4 right-4",
-        "bottom-left": "bottom-4 left-4",
-        "bottom-right": "bottom-4 right-4",
+    // Close function (handles both controlled & uncontrolled usage)
+    const handleClose = () => {
+        if (isControlled) {
+            close();
+        } else {
+            setIsOpen(false);
+            setEditId(null)
+        }
     };
 
     return (
         <div
-            className={`fixed z-[999999999999999] ${positionStyles[position]} ${shapeStyles[shape]} p-6 bg-white ${shadowStyles[shadow]} border border-gray-300 max-w-max w-auto`}
+            className={`left-[2%] fixed z-[999999999999999] ${position === "center" ? "top-1/2 transform  -translate-y-1/2" : ""}
+            ${shape === "rounded" ? "rounded-lg" : "rounded-none"} p-6 bg-white ${shadow === "md" ? "shadow-md" : "shadow-sm"} 
+            border border-gray-300 max-w-max w-auto transition-transform duration-300 scale-100 opacity-100`}
             style={{ width }}
         >
             <button
-                className={`absolute cursor-pointer ${closeButtonPositionStyles[closeButtonPosition]} text-white bg-primary w-6 h-6 rounded-full`}
+                className={`absolute cursor-pointer ${closeButtonPosition === "top-right" ? "top-4 right-4" : "top-4 left-4"} 
+                text-white bg-primary w-6 h-6 rounded-full`}
                 onClick={() => {
                     if (window.confirm('Are you sure you want to discard the order?')) {
-                        close(); // Only close if user confirms
+                        handleClose();
                     }
                 }}
             >
@@ -98,11 +90,13 @@ const Window = ({
             </button>
 
             <div onClick={(e) => e.stopPropagation()}>
-                {isValidElement(children) ? cloneElement(children, { close }) : null}
+                {isValidElement(children) ? cloneElement(children, { close: handleClose }) : children}
             </div>
         </div>
     );
 };
+
+
 
 // Attach Open and Window components to Modal
 Modal.Open = Open;

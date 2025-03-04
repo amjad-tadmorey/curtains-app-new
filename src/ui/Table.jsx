@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { FaEllipsisV, FaEye, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import { FaEllipsisV, FaEye, FaSort, FaSortUp, FaSortDown, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Table = ({
@@ -7,10 +7,12 @@ const Table = ({
     data,
     rowStates,
     onRowStateChange,
+    onRowEdit,
     menuIcon = <FaEllipsisV />,
     shadow = "shadow-lg",
     rowsPerPage = 5,
-    view, // Optional: URL template for the view column
+    view, // URL template for the view column
+    enableEdit = false, // NEW PROP: Controls edit column visibility
 }) => {
     const [sortConfig, setSortConfig] = useState({ key: "", direction: null });
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
@@ -50,11 +52,6 @@ const Table = ({
         window.scrollTo({ top: 0, behavior: "smooth" });
     }, [currentPage]);
 
-    const handleStateChange = (rowProp, newState) => {
-        onRowStateChange(rowProp, newState);
-        setOpenMenuIndex(null);
-    };
-
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
@@ -66,6 +63,7 @@ const Table = ({
             <table className="min-w-full border-collapse bg-white rounded-lg">
                 <thead className="bg-gray-100 text-gray-600">
                     <tr className="text-sm">
+                        {enableEdit && <th className="py-4 px-6 text-center">Edit</th>} {/* EDIT COLUMN HEADER */}
                         {columns.map((column, index) => (
                             <th
                                 key={`${column.header}-${index}`}
@@ -95,10 +93,18 @@ const Table = ({
                             key={row.id}
                             className={`text-sm text-gray-700 ${row.id % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-200`}
                         >
+                            {enableEdit && (
+                                <td className="py-4 px-6 text-center border-t border-gray-300">
+                                    <button
+                                        className="text-yellow-600 hover:text-yellow-800 transition-all"
+                                        onClick={() => onRowEdit(row.id)}
+                                    >
+                                        <FaEdit />
+                                    </button>
+                                </td>
+                            )}
                             {columns.map((column) => {
                                 const cellValue = row[column.accessor];
-
-                                // If column is "status", apply dynamic class
                                 const cellClass = column.accessor === "status" ? `status-${cellValue.toLowerCase().replace(/\s+/g, "-")}` : "";
 
                                 return (
@@ -130,7 +136,7 @@ const Table = ({
                                             <button
                                                 key={state}
                                                 className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100"
-                                                onClick={() => handleStateChange(row.id, state)}
+                                                onClick={() => onRowStateChange(row.id, state)}
                                             >
                                                 {state}
                                             </button>

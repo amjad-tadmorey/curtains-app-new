@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useProducts } from '../products/useProducts'
 import { useAddOrder } from './useAddOrder'
@@ -9,10 +9,19 @@ import CuttOff from './CuttOff'
 import Button from '../../ui/Button'
 import toast from 'react-hot-toast'
 import Spinner from '../../ui/Spinner'
+import { useOrderById } from './useOrderById'
 
 
-export default function AddOrderForm({ close }) {
+export default function AddOrderForm({ close, edit }) {
+    const [editSession, setEditSession] = useState(false)
+    useEffect(() => {
+        if (edit) setEditSession(true)
+        if (!edit) setEditSession(false)
+    }, [edit])
+
+
     const { products, isLoading } = useProducts()
+    const { order, isLoading: isLoadingOrder } = useOrderById(edit || 0)
     const { addOrder } = useAddOrder()
     const methods = useForm();
     useEffect(() => {
@@ -67,8 +76,6 @@ export default function AddOrderForm({ close }) {
         };
     }
 
-
-
     function onSubmit(orderData) {
         if (orderData.order_type === 'خياطة' && orderData.rooms === undefined) return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
         if (orderData.order_type === "خام") {
@@ -96,25 +103,71 @@ export default function AddOrderForm({ close }) {
             });
         }
     }
+    console.log(order);
 
 
-    if (isLoading) return <Spinner />
+    if (isLoading || isLoadingOrder) return <Spinner />
     return (
         <div dir='rtl' className='min-w-[95vw] h-[80vh] overflow-y-scroll px-8'>
             <h1 className='mb-8 border-b border-dark w-fit pr-12 pb-2 font-bold text-2xl'>Add Order</h1>
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)} className='px-4'>
                     {/* Genral Info */}
-                    <GeneralInfo />
+                    <GeneralInfo editSession={editSession} />
 
                     {/* Products Selection */}
-                    <Products methods={methods} products={products} />
+                    <Products methods={methods} products={products} editSession={editSession} oldOrder={[
+                        {
+                            product: "قطيفة سيليا عرضين || 270-10-0001-15-00007 || 143 || fabrics",
+                            quantity: 2.5
+                        },
+                        {
+                            product: "مواسير برونز سادة || 270-10-0003-13-00004 || 400 || rails",
+                            quantity: 2
+                        },
+                        {
+                            product: "حمالة كريستال وردة || 270-10-0003-05-00001 || 235 || accessories",
+                            quantity: 1
+                        }
+                    ]} />
 
                     {/* Rooms */}
-                    <Rooms methods={methods} />
+                    <Rooms methods={methods} editSession={editSession} oldOrder={[{
+                        oima: [],
+                        roll: [],
+                        rails: {
+                            type: "لايوجد",
+                            notes: "",
+                            product: "مواسير برونز سادة || 270-10-0003-13-00004 || 400 || rails",
+                            quantity: "1.15"
+                        },
+                        cleats: [],
+                        fabrics: {
+                            type: "عادي",
+                            notes: "",
+                            product: "قطيفة سيليا عرضين || 270-10-0001-15-00007 || 143 || fabrics",
+                            quantity: "2.5"
+                        },
+                        remarks: "مربط قماش عدد 1 من القطيفة",
+                        windows: {
+                            src: "/windows/shape-1.svg",
+                            note: "",
+                            type: "تركيب",
+                            width: "115",
+                            height: "250",
+                            imageId: 1
+                        },
+                        room_name: "طرقة",
+                        accessories: {
+                            type: "برونز",
+                            notes: "",
+                            product: "حمالة كريستال وردة || 270-10-0003-05-00001 || 235 || accessories",
+                            quantity: "1"
+                        }
+                    }]} />
 
                     {/* Cutt Off */}
-                    <CuttOff methods={methods} products={methods.getValues().products || []} />
+                    <CuttOff methods={methods} products={methods.getValues().products || []} editSession={editSession} />
                     <Button className='mt-12 block' variant='success' size='lg'>Submit</Button>
                 </form>
             </FormProvider>

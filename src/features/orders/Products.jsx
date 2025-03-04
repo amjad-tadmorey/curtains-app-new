@@ -5,8 +5,8 @@ import MultipleInputs from '../../ui/MultipleInputs'
 import { useEffect } from 'react';
 import MultipleLabeledInputs from '../../ui/MultipleLabeledInputs';
 
-export default function Products({ methods, products }) {
-    const watchedProducts = methods.watch("products");
+export default function Products({ methods, products, oldOrder }) {
+    const watchedProducts = methods.watch("products", oldOrder);
     useEffect(() => {
         console.log("Form changed, current products:", watchedProducts);
     }, [watchedProducts]);
@@ -31,7 +31,7 @@ export default function Products({ methods, products }) {
                 <Controller
                     name="products"
                     control={methods.control}
-                    // defaultValue={[{ product: '', quantity: 0 }]}
+                    defaultValue={oldOrder}
                     render={({ field }) => (
                         <>
                             {field.value?.map((_, index) => (

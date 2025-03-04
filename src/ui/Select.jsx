@@ -1,7 +1,7 @@
 import { useFormContext, Controller } from "react-hook-form";
 import Select from "react-select";
 
-const SearchableSelect = ({ name, label, options, required = false }) => {
+const SearchableSelect = ({ name, label, options, required = false, defaultValue }) => {
     const {
         control,
         formState: { errors },
@@ -11,6 +11,7 @@ const SearchableSelect = ({ name, label, options, required = false }) => {
         <div className="w-full">
             {label && <label className="block text-sm font-medium mb-1">{label}</label>}
             <Controller
+                defaultValue={defaultValue}
                 name={name}
                 control={control}
                 rules={{ required: required && "This field is required" }}

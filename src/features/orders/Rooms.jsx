@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Select from "../../ui/Select";
 import Input from "../../ui/Input";
 import Textarea from "../../ui/Textarea";
+import { Controller } from "react-hook-form";
 
 const typeOptions = [ //'fabrics', 'cleats', 'accessories', 'rails'
     [
@@ -38,7 +39,7 @@ const windowShapes = Array.from({ length: 19 }, (_, i) => ({
     imageId: i + 1,
 }));
 
-export default function Rooms({ methods }) {
+export default function Rooms({ methods, oldOrder }) {
     const watchedProducts = methods.watch("products", []);
     const watchedRooms = methods.watch("rooms", []);
     const [selectedRoomIndex, setSelectedRoomIndex] = useState(null);
@@ -109,6 +110,31 @@ export default function Rooms({ methods }) {
                             ].map((category, i) => (
                                 <div key={category.value}>
                                     <h4 className="font-medium mt-2">{category.name}</h4>
+                                    {/* <Controller
+                                        name="products"
+                                        control={methods.control}
+                                        defaultValue={oldOrder[i]}
+                                        render={({ field }) => (
+                                            <>
+                                                {field.value?.map((_, index) => (
+                                                    <div key={index} className="mb-4 flex items-center space-x-4">
+                                                        <Select
+                                                            name={`products[${index}].product`}
+                                                            // options={products}
+                                                            options={watchedProducts.filter(p => p.product.split("||")[3]?.trim() === category.value).map(p => ({ value: p.product, label: p.product.split("||")[0] }))}
+                                                            label="Select Product"
+                                                            required={true}
+                                                        />
+                                                        <Input required={true} name={`rooms[${roomIndex}].${category.value}[${index}].quantity`} label="الكمية" type="number" step="0.01" min="0" />
+                                                        <Select required={true} name={`rooms[${roomIndex}].${category.value}[${index}].type`} options={typeOptions[i]} label="النوع" />
+                                                        <Input required={false} name={`rooms[${roomIndex}].${category.value}[${index}].notes`} label="ملاحظات" type="text" />
+
+                                                        <button type="button" onClick={() => handleDeleteItem(roomIndex, category.value, index)} className="text-red-500 cursor-pointer">×</button>
+                                                    </div>
+                                                ))}
+                                            </>
+                                        )}
+                                    /> */}
                                     {room[category.value]?.map((_, itemIndex) => (
                                         <div key={itemIndex} className="flex space-x-4 items-center">
                                             <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.filter(p => p.product.split("||")[3]?.trim() === category.value).map(p => ({ value: p.product, label: p.product.split("||")[0] }))} label="إختر منتج" />
@@ -129,7 +155,7 @@ export default function Rooms({ methods }) {
                             <button type="button" onClick={() => handleAddWindow(roomIndex)} className="bg-blue-500 text-white px-3 py-1 rounded-md mb-2">
                                 + أضف نافذة
                             </button>
-                            {room.windows.map((win, winIndex) => (
+                            {room?.windows?.map((win, winIndex) => (
                                 <div key={winIndex} className="flex items-center gap-4 mb-2">
                                     <img src={win.src} alt={`Window ${win.imageId}`} className="w-16 h-16 border rounded" />
                                     <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width`} label="العرض" type="number" />
