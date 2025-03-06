@@ -12,6 +12,7 @@ export default function Products() {
     const columns = [
         { header: "ID", accessor: "sapID", isSortable: true },
         { header: "Product name", accessor: "productName", isSortable: true },
+        { header: "Product Type", accessor: "productType", isSortable: true },
         { header: "In-stock", accessor: "inStock", isSortable: false },
         { header: "Status", accessor: "status", isSortable: false },
     ];

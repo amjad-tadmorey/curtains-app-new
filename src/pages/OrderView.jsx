@@ -23,7 +23,6 @@ export default function OrderView() {
 
     }, [])
 
-
     const queryClient = useQueryClient()
     const pdfRef = useRef();
     const handlePrint = () => {
@@ -38,6 +37,19 @@ export default function OrderView() {
                 jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
             })
             .from(pdfRef.current)
+            .toPdf()
+            .get("pdf")
+            .then((pdf) => {
+                const totalPages = pdf.internal.getNumberOfPages();
+
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+
+                    // Add pagination at the bottom center
+                    pdf.setFontSize(10);
+                    pdf.text(`Page ${i} of ${totalPages}`, pdf.internal.pageSize.width / 2, pdf.internal.pageSize.height - 10, { align: "center" });
+                }
+            })
             .save();
     };
 
@@ -88,8 +100,14 @@ export default function OrderView() {
         <div dir="rtl" className="flex flex-col items-center p-6">
             {/* 🖨️ Print Button */}
             <button
-                onClick={handlePrint}
-                className="mb-4 px-4 py-1 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
+                onClick={() => {
+                    if (order.status !== 'pending') {
+                        alert(`لا يمكن حفظ الاوردر بعد تحويله من قيد الانتظار ل ${order.status} !`)
+                    } else {
+                        handlePrint()
+                    }
+                }}
+                className={`mb-4 px-4 py-1 ${order.status == 'pending' ? 'bg-blue-600 hover:bg-blue-700' : order.status !== 'pending' ? 'bg-dark hover:bg-dark-hover' : ''} text-white rounded-md shadow-md `}
             >
                 حفظ الطلب 📄
             </button>
@@ -424,6 +442,6 @@ export default function OrderView() {
                 ))}
                 <h1 className="text-center text-2xl font-bold mt-12">انتهى الاوردر</h1>
             </div>
-        </div>
+        </div >
     );
 }
