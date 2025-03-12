@@ -175,7 +175,7 @@ export default function OrderView() {
                             <hr className="col-span-3" />
                             <div className="flex flex-col col-span-3">
                                 <p>العنوان</p>
-                                <p className="font-bold">{order.address}</p>
+                                <p className="font-bold">{order.area} / {order.address}</p>
                             </div>
                         </Card.Body>
                     </Card>

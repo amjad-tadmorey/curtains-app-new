@@ -72,7 +72,7 @@ const Window = ({
 
     return (
         <div
-            className={`left-[2%] fixed z-[999999999999999] ${position === "center" ? "top-1/2 transform  -translate-y-1/2" : ""}
+            className={`top-10 left-[2%] fixed z-[999999999999999] ${position === "center" ? "top-1/2 transform  -translate-y-1/2" : ""}
             ${shape === "rounded" ? "rounded-lg" : "rounded-none"} p-6 bg-white ${shadow === "md" ? "shadow-md" : "shadow-sm"} 
             border border-gray-300 max-w-max w-auto transition-transform duration-300 scale-100 opacity-100`}
             style={{ width }}

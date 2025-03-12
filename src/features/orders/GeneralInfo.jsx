@@ -11,7 +11,9 @@ export default function GeneralInfo() {
                 <Input name='phone_number' label="رقم الهاتف (مصر)" required={true} re={'11-digit'} />
                 <Input name='phone_number_2' label="رقم الهاتف 2 (مصر) (اختياري)" re={'11-digit'} />
                 <Input name='phone_number_3' label="الهاتف رقم 3 (اختياراي)" />
+                <Input name='area' label="المنطقة" required={true} />
                 <Input name='address' label="العنوان" required={true} />
+
                 <Select name='show_room' label="إسم الصالة" required={true} options={
                     [
                         { key: 'التجمع الاول', label: 'التجمع الاول', value: 'التجمع الاول' },
@@ -25,7 +27,7 @@ export default function GeneralInfo() {
                 <Select name='sales_man' label="إسام البائع" required={true} options={
                     [
                         { key: 'عبد الرحمن اشمر', label: 'عبد الرحمن أشمر', value: 'عبد الرحمن أشمر' },
-                        { key: 'اسماء عبد الرؤوف', label: 'اسماء عبد الرؤوف', value: 'اسماء عبد الرؤوف' },
+                        { key: 'اسماء محمد عبد القادر', label: 'اسماء محمد عبد القادر', value: 'اسماء محمد عبد القادر' },
                         { key: 'زكريا أحمد', label: 'زكريا أحمد', value: 'زكريا أحمد' },
                         { key: 'رضوان الخطيب', label: 'رضوان الخطيب', value: 'رضوان الخطيب' },
                         { key: 'احمد عبد السلام', label: 'احمد عبد السلام', value: 'احمد عبد السلام' },

@@ -34,7 +34,7 @@ const typeOptions = [ //'fabrics', 'cleats', 'accessories', 'rails'
     ],
 ];
 
-const windowShapes = Array.from({ length: 19 }, (_, i) => ({
+const windowShapes = Array.from({ length: 22 }, (_, i) => ({
     src: `/windows/shape-${i + 1}.svg`,
     imageId: i + 1,
 }));
@@ -110,34 +110,9 @@ export default function Rooms({ methods, oldOrder }) {
                             ].map((category, i) => (
                                 <div key={category.value}>
                                     <h4 className="font-medium mt-2">{category.name}</h4>
-                                    {/* <Controller
-                                        name="products"
-                                        control={methods.control}
-                                        defaultValue={oldOrder[i]}
-                                        render={({ field }) => (
-                                            <>
-                                                {field.value?.map((_, index) => (
-                                                    <div key={index} className="mb-4 flex items-center space-x-4">
-                                                        <Select
-                                                            name={`products[${index}].product`}
-                                                            // options={products}
-                                                            options={watchedProducts.filter(p => p.product.split("||")[3]?.trim() === category.value).map(p => ({ value: p.product, label: p.product.split("||")[0] }))}
-                                                            label="Select Product"
-                                                            required={true}
-                                                        />
-                                                        <Input required={true} name={`rooms[${roomIndex}].${category.value}[${index}].quantity`} label="الكمية" type="number" step="0.01" min="0" />
-                                                        <Select required={true} name={`rooms[${roomIndex}].${category.value}[${index}].type`} options={typeOptions[i]} label="النوع" />
-                                                        <Input required={false} name={`rooms[${roomIndex}].${category.value}[${index}].notes`} label="ملاحظات" type="text" />
-
-                                                        <button type="button" onClick={() => handleDeleteItem(roomIndex, category.value, index)} className="text-red-500 cursor-pointer">×</button>
-                                                    </div>
-                                                ))}
-                                            </>
-                                        )}
-                                    /> */}
                                     {room[category.value]?.map((_, itemIndex) => (
                                         <div key={itemIndex} className="flex space-x-4 items-center">
-                                            <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.filter(p => p.product.split("||")[3]?.trim() === category.value).map(p => ({ value: p.product, label: p.product.split("||")[0] }))} label="إختر منتج" />
+                                            <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.filter(p => category.value === 'cleats' ? p.product.split("||")[3]?.trim() === 'cleats' || p.product.split("||")[3]?.trim() === 'fabrics' : p.product.split("||")[3]?.trim() === category.value).map(p => ({ value: p.product, label: p.product.split("||")[0] }))} label="إختر منتج" />
                                             <Input required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].quantity`} label="الكمية" type="number" step="0.01" min="0" />
                                             <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].type`} options={typeOptions[i]} label="النوع" />
                                             <Input required={false} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].notes`} label="ملاحظات" type="text" />

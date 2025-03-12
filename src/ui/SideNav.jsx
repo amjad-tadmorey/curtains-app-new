@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { FaHome, FaList, FaShoppingCart, FaCog, FaUsers } from "react-icons/fa";
+import Logout from "../features/auth/Logout";
 
 const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: FaHome },
@@ -14,7 +15,7 @@ export default function SideNav() {
         <aside className="w-64 h-screen bg-gray-900 text-white p-4 flex flex-col">
             <img src="/Logo.png" alt="" />
             <h1 className="text-xl font-bold mb-6 mt-3">Kabbani Curtains App</h1>
-            <nav className="flex flex-col space-y-2">
+            <nav className="flex flex-col space-y-2 flex-1">
                 {navItems.map(({ name, path, icon: Icon }) => (
                     <NavLink
                         key={path}
@@ -28,6 +29,8 @@ export default function SideNav() {
                     </NavLink>
                 ))}
             </nav>
+
+            <Logout />
         </aside>
     );
 }

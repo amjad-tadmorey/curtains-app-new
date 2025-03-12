@@ -8,8 +8,14 @@ import { useChangeStatus } from '../features/orders/useChangeStatus';
 import { useQueryClient } from '@tanstack/react-query';
 import Spinner from '../ui/Spinner';
 import { formatDate } from '../utils/helpers';
+import DateFilter from '../ui/DateFilter';
 
 export default function Orders() {
+    const [startDate, setStartDate] = useState(new Date("2025-01-01").toISOString().split("T")[0]);
+    const [endDate, setEndDate] = useState(new Date("2026-01-01").toISOString().split("T")[0]);
+    const [searchTerm, setSearchTerm] = useState("");
+
+
     const [editId, setEditId] = useState(null)
     const queryClient = useQueryClient()
     const { orders, isLoading } = useOrders()
@@ -20,6 +26,7 @@ export default function Orders() {
         { header: "Created At", accessor: "created_at", isSortable: true },
         { header: "Customer name", accessor: "customer_name", isSortable: true },
         { header: "Phone number", accessor: "phone_number", isSortable: true },
+        { header: "Area", accessor: "area", isSortable: true },
         { header: "Delivery type", accessor: "delivery_type", isSortable: true },
         { header: "Delivery Date", accessor: "delivery_date", isSortable: true },
         { header: "Sales man", accessor: "sales_man", isSortable: true },
@@ -32,7 +39,6 @@ export default function Orders() {
 
     if (isLoading) return <Spinner />
 
-    console.log(orders);
 
 
     function onRowStateChange(rowIndex, newState) {
@@ -49,12 +55,24 @@ export default function Orders() {
 
     const sortedOrders = orders
         .map(o => ({ ...o, created_at: formatDate(o.created_at) })) // Create a new object with "created_at" set
-        .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date));
+        .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date))
+        .filter(item => (!startDate || new Date(item.delivery_date) >= new Date(startDate)) && (!endDate || new Date(item.delivery_date) <= new Date(endDate)))
+        .filter(item => !searchTerm || Object.values(item).some(value => String(value).toLowerCase().includes(searchTerm.toLowerCase())))
+
+
 
     return (
         <div className="p-12">
             <div className="mb-12">
-                <div className="ml-auto w-fit">
+                <div className="w-full flex items-center gap-12">
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Search..."
+                        className="w-64 text-2xl border border-gray-300 px-4 py-2 rounded-lg flex-1"
+                    />
+                    <DateFilter setStartDate={setStartDate} setEndDate={setEndDate} startDate={startDate} endDate={endDate} />
                     <Modal>
                         <Modal.Open opens="add-order">
                             <Button>Add Order +</Button>
@@ -74,13 +92,7 @@ export default function Orders() {
                 view="/orders/{id}" // ✅ Pass view URL pattern
                 onRowStateChange={onRowStateChange}
                 onRowEdit={onRowEdit}
-            // enableEdit={true}
             />
-            {
-                editId && <Modal.Window setEditId={setEditId} name="always-visible">
-                    <AddOrderForm edit={editId} />
-                </Modal.Window>
-            }
         </div>
     )
 }
