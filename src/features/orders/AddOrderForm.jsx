@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useProducts } from '../products/useProducts'
 import { useAddOrder } from './useAddOrder'
+import { useAuth } from '../../context/AuthContext'
 import GeneralInfo from './GeneralInfo'
 import Products from './Products'
 import Rooms from './Rooms'
@@ -13,6 +14,8 @@ import { useOrderById } from './useOrderById'
 
 
 export default function AddOrderForm({ close, edit }) {
+    const { user: { user_metadata: { branch }, isLoading: isLoadingAuth } } = useAuth()
+
     const [editSession, setEditSession] = useState(false)
     useEffect(() => {
         if (edit) setEditSession(true)
@@ -20,9 +23,9 @@ export default function AddOrderForm({ close, edit }) {
     }, [edit])
 
 
-    const { products, isLoading } = useProducts()
+    const { products, isLoading: isLoadingProducts } = useProducts()
     const { order, isLoading: isLoadingOrder } = useOrderById(edit || 0)
-    const { addOrder } = useAddOrder()
+    const { addOrder, isAdding } = useAddOrder()
     const methods = useForm();
     useEffect(() => {
     }, [methods.watch()]);
@@ -63,10 +66,10 @@ export default function AddOrderForm({ close, edit }) {
             const available = productQuantities[product];
             const used = usedQuantities[product] || 0;
 
-            if (used > available) {
-                errors.push(`🚨 Product "${product.split(" || ")[0]}" is OVERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
+            if (used.toFixed(2) > available.toFixed(2)) {
+                errors.push(`🚨 لا يمكن استهلاك كميات اكبر من الكمية المطلوبة للمنتج \n(${product.split(" || ")[0]}" تم استهلاك: ${used.toFixed(2)}, الكمية المطلوبة: ${(available).toFixed(2)}) \n ________________________________________________________________`);
             } else if (used < available) {
-                errors.push(`⚠️ Product "${product.split(" || ")[0]}" is UNDERUSED. Used: ${used}, Available: ${(available - used).toFixed(2)}`);
+                errors.push(`⚠ لا يمكن إنشاء الأوردر مع وجود منتجات لم يتم استهلاك كميتها بالكامل \n (${product.split(" || ")[0]}" تم استهلاك: ${used.toFixed(2)}, المتاح: ${(available - used).toFixed(2)}) \n ______________________________________________________________`);
             }
         });
 
@@ -76,10 +79,26 @@ export default function AddOrderForm({ close, edit }) {
         };
     }
 
+    function validateProducts(rooms, products) {
+        const requiredProduct = "مجر ويفي || 270-10-0003-01-00002 || 418 || rails";
+
+        // Check if any fabric has type "ويفي"
+        const hasWeaveFabric = rooms.some(room =>
+            room.fabrics.some(fabric => fabric.type === "ويفي")
+        );
+
+        // If there is a "ويفي" fabric, check if the required product exists in products
+        if (hasWeaveFabric) {
+            return products.some(product => product.product === requiredProduct);
+        }
+
+        return true;
+    }
+
     function onSubmit(orderData) {
         if (orderData.order_type === 'خياطة' && orderData.rooms === undefined) return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
         if (orderData.order_type === "خام") {
-            addOrder({ ...orderData, status: 'pending' }, {
+            addOrder({ ...orderData, status: 'pending', branch }, {
                 onSuccess: () => {
                     close()
                     methods.reset()
@@ -87,6 +106,9 @@ export default function AddOrderForm({ close, edit }) {
                 }
             });
         } else {
+
+            if (!validateProducts(orderData.rooms, orderData.products)) return alert('🚨 لا يمكن اختيار نوع خياطة ويفي و لم يتم ضافة مجر ويفي في المنتجات')
+
             const { products, rooms, cuttoff_materials } = orderData;
             const result = compareRoomQuantities(products, rooms, cuttoff_materials);
             if (!result.isValid) {
@@ -94,7 +116,7 @@ export default function AddOrderForm({ close, edit }) {
                 alert(result.errors.join("\n"));  // Show errors in an alert
                 return; // Stop form submission if invalid
             }
-            addOrder({ ...orderData, status: 'pending' }, {
+            addOrder({ ...orderData, status: 'pending', branch }, {
                 onSuccess: () => {
                     close()
                     methods.reset()
@@ -103,10 +125,9 @@ export default function AddOrderForm({ close, edit }) {
             });
         }
     }
-    console.log(order);
 
 
-    if (isLoading || isLoadingOrder) return <Spinner />
+    if (isLoadingProducts || isLoadingOrder || isLoadingAuth) return <Spinner />
     return (
         <div dir='rtl' className='min-w-[95vw] h-[80vh] overflow-y-scroll px-8'>
             <h1 className='mb-8 border-b border-dark w-fit pr-12 pb-2 font-bold text-2xl'>Add Order</h1>
@@ -116,59 +137,14 @@ export default function AddOrderForm({ close, edit }) {
                     <GeneralInfo editSession={editSession} />
 
                     {/* Products Selection */}
-                    <Products methods={methods} products={products} editSession={editSession} oldOrder={[
-                        {
-                            product: "قطيفة سيليا عرضين || 270-10-0001-15-00007 || 143 || fabrics",
-                            quantity: 2.5
-                        },
-                        {
-                            product: "مواسير برونز سادة || 270-10-0003-13-00004 || 400 || rails",
-                            quantity: 2
-                        },
-                        {
-                            product: "حمالة كريستال وردة || 270-10-0003-05-00001 || 235 || accessories",
-                            quantity: 1
-                        }
-                    ]} />
+                    <Products methods={methods} products={products} />
 
                     {/* Rooms */}
-                    <Rooms methods={methods} editSession={editSession} oldOrder={[{
-                        oima: [],
-                        roll: [],
-                        rails: {
-                            type: "لايوجد",
-                            notes: "",
-                            product: "مواسير برونز سادة || 270-10-0003-13-00004 || 400 || rails",
-                            quantity: "1.15"
-                        },
-                        cleats: [],
-                        fabrics: {
-                            type: "عادي",
-                            notes: "",
-                            product: "قطيفة سيليا عرضين || 270-10-0001-15-00007 || 143 || fabrics",
-                            quantity: "2.5"
-                        },
-                        remarks: "مربط قماش عدد 1 من القطيفة",
-                        windows: {
-                            src: "/windows/shape-1.svg",
-                            note: "",
-                            type: "تركيب",
-                            width: "115",
-                            height: "250",
-                            imageId: 1
-                        },
-                        room_name: "طرقة",
-                        accessories: {
-                            type: "برونز",
-                            notes: "",
-                            product: "حمالة كريستال وردة || 270-10-0003-05-00001 || 235 || accessories",
-                            quantity: "1"
-                        }
-                    }]} />
+                    <Rooms methods={methods} />
 
                     {/* Cutt Off */}
-                    <CuttOff methods={methods} products={methods.getValues().products || []} editSession={editSession} />
-                    <Button className='mt-12 block' variant='success' size='lg'>Submit</Button>
+                    <CuttOff methods={methods} products={methods.getValues().products || []} />
+                    <Button disabled={isAdding} className='mt-12 block' variant='success' size='lg'>Submit</Button>
                 </form>
             </FormProvider>
         </div>

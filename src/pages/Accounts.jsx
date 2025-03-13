@@ -88,11 +88,11 @@ export default function Accounts() {
                 <div className="mb-4">
                     <label className="block text-gray-700">Branch</label>
                     <select className="w-full p-2 border rounded-lg" {...register("branch", { required: "Branch is required" })}>
+                        <option value="all">All</option>
                         <option value="cairo">Cairo</option>
                         <option value="alexandria">Alexandria</option>
                         <option value="october">October</option>
                         <option value="delta">Delta</option>
-                        <option value="fayoum">Fayoum</option>
                     </select>
                     {errors.branch && <p className="text-red-500">{errors.branch.message}</p>}
                 </div>

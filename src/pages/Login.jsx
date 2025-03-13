@@ -86,11 +86,11 @@ export default function Login() {
                         required
                     >
                         <option value="">Select a branch</option>
+                        <option value="all">All</option>
                         <option value="cairo">Cairo</option>
                         <option value="alexandria">Alexandria</option>
                         <option value="october">October</option>
                         <option value="delta">Delta</option>
-                        <option value="fayoum">Fayoum</option>
                     </select>
                 </div>
 

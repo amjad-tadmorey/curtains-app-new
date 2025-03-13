@@ -2,51 +2,25 @@ import { useEffect, useState } from "react";
 import Select from "../../ui/Select";
 import Input from "../../ui/Input";
 import Textarea from "../../ui/Textarea";
-import { Controller } from "react-hook-form";
+import { useReference } from "../../context/ReferenceContext";
 
-const typeOptions = [ //'fabrics', 'cleats', 'accessories', 'rails'
-    [
-        { value: "عادي", label: "عادي" },
-        { value: "حلق", label: "حلق" },
-        { value: "تكسير", label: "تكسير" },
-        { value: "ويفي", label: "ويفي" },
-        { value: "شوكة", label: "شوكة" },
-        { value: "تدكيك", label: "تدكيك" },
-        { value: "ايكيا", label: "ايكيا" },
-    ],
-    [
-        { value: "عادي", label: "عادي" },
-        { value: "سكوتش", label: "سكوتش" },
-    ],
-    [
-        { value: "احمر", label: "احمر" },
-        { value: "برونز", label: "برونز" },
-        { value: "فضي", label: "فضي" }
-    ],
-    [
-        { value: "لايوجد", label: "لايوجد" }
-    ],
-    [
-        { value: "لايوجد", label: "لايوجد" }
-    ],
-    [
-        { value: "لايوجد", label: "لايوجد" }
-    ],
-];
+// const windowShapes = Array.from({ length: 22 }, (_, i) => ({
+//     src: `/windows/shape-${i + 1}.svg`,
+//     imageId: i + 1,
+// }));
 
-const windowShapes = Array.from({ length: 22 }, (_, i) => ({
-    src: `/windows/shape-${i + 1}.svg`,
-    imageId: i + 1,
-}));
-
-export default function Rooms({ methods, oldOrder }) {
+export default function Rooms({ methods }) {
     const watchedProducts = methods.watch("products", []);
     const watchedRooms = methods.watch("rooms", []);
     const [selectedRoomIndex, setSelectedRoomIndex] = useState(null);
     const [isWindowPickerOpen, setIsWindowPickerOpen] = useState(false);
+    const { productsTypeOptions: typeOptions, windows: windowShapes } = useReference()
+
+    console.log(windowShapes);
+    console.log(typeOptions);
 
     useEffect(() => {
-        console.log("Form changed, current rooms:", watchedRooms);
+        // console.log("Form changed, current rooms:", watchedRooms);
     }, [watchedRooms]);
 
     const handleAddRoom = () => {
@@ -161,7 +135,7 @@ export default function Rooms({ methods, oldOrder }) {
                     </div>
                 </div>
             )}
-            <button type="button" onClick={handleAddRoom} className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-700 cursor-pointer transition-all duration-200 text-white rounded-md">+ Add Room</button>
+            <button type="button" onClick={handleAddRoom} className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-700 cursor-pointer transition-all duration-200 text-white rounded-md">+ أضف غرفة</button>
         </div>
     );
 }

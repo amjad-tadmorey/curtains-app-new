@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { FaEllipsisV, FaEye, FaSort, FaSortUp, FaSortDown, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Spinner from "./Spinner";
+import MiniSpinner from "./MiniSpinner";
 
 const Table = ({
     columns,
@@ -18,6 +20,7 @@ const Table = ({
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState({});
+    const [loadingRowId, setLoadingRowId] = useState(null);
     const navigate = useNavigate();
 
     const handleSort = (key) => {
@@ -67,6 +70,32 @@ const Table = ({
     };
 
     const getViewUrl = (row) => (view ? view.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#");
+
+
+    const handleRowStateChange = async (rowId, state) => {
+        setLoadingRowId(rowId);
+        try {
+            await new Promise((resolve, reject) => {
+                onRowStateChange({ rowId, state }, {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries({ queryKey: [`orders`] });
+                        resolve();
+                    },
+                    onError: (error) => {
+                        console.error("Error changing state:", error);
+                        reject(error);
+                    }
+                });
+                setOpenMenuIndex(null)
+                setLoadingRowId(null);
+            });
+        } catch (error) {
+            console.error("Failed to change row state:", error);
+        } finally {
+        }
+    };
+
+
 
     return (
         <div className={`overflow-x-auto ${shadow} rounded-lg`}>
@@ -134,12 +163,15 @@ const Table = ({
                                     {menuIcon}
                                 </button>
                                 {openMenuIndex === row.id && (
-                                    <div className="absolute bg-white border rounded-lg shadow-md mt-1 right-0 w-40 z-10">
-                                        {rowStates.map((state) => (
-                                            <button key={state} className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100" onClick={() => onRowStateChange(row.id, state)}>
-                                                {state}
-                                            </button>
-                                        ))}
+                                    <div className="absolute bg-white border rounded-lg shadow-md mt-1 right-0 w-40 z-10 h-44 flex justify-center items-center flex-col">
+                                        {
+                                            loadingRowId !== null ? <MiniSpinner /> :
+                                                rowStates.map((state) => (
+                                                    <button key={state} className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100" onClick={() => handleRowStateChange(row.id, state)}>
+                                                        {state}
+                                                    </button>
+                                                ))
+                                        }
                                     </div>
                                 )}
                             </td>

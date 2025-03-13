@@ -1,5 +1,6 @@
 import supabase from "./supabase";
 
+
 export async function addOrder(newOrder) {
     const { data, error } = await supabase
         .from('orders')
@@ -15,17 +16,35 @@ export async function addOrder(newOrder) {
     return data
 }
 
-export async function getOrders() {
+export async function getOrders(branch) {
     const { data: orders, error } = await supabase
-        .from('orders')
-        .select('*')
-    if (error) {
-        console.log(error);
-        throw new Error('Orders could not be loaded')
+    if (branch === 'all') {
+        const { data: orders, error } = await supabase
+            .from('orders')
+            .select('*')
+
+        if (error) {
+            console.log(error);
+            throw new Error('Orders could not be loaded');
+        }
+
+        return orders;
+    } else {
+        const { data: orders, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('branch', branch);
+
+        if (error) {
+            console.log(error);
+            throw new Error('Orders could not be loaded');
+        }
+
+        return orders;
     }
-    return orders
 
 }
+
 
 export async function getOrderById(id) {
     const { data: order, error } = await supabase

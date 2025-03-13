@@ -1,7 +1,16 @@
+import { useAuth } from '../../context/AuthContext'
+import { useReference } from '../../context/ReferenceContext'
 import Input from '../../ui/Input'
 import Select from '../../ui/Select'
 
 export default function GeneralInfo() {
+    const { show_rooms } = useReference()
+    const { user, isLoading } = useAuth()
+    if (isLoading) return null
+    console.log(user.user_metadata.branch);
+    console.log(show_rooms[user.user_metadata.branch]);
+
+
     return (
         <div className='mb-8 pb-4 border-b border-gray-300'>
             <h2 className='text-xl font-bold mb-4'>General Info : </h2>
@@ -15,14 +24,8 @@ export default function GeneralInfo() {
                 <Input name='address' label="العنوان" required={true} />
 
                 <Select name='show_room' label="إسم الصالة" required={true} options={
-                    [
-                        { key: 'التجمع الاول', label: 'التجمع الاول', value: 'التجمع الاول' },
-                        { key: 'التسعين', label: 'التسعين', value: 'التسعين' },
-                        { key: 'الشروق', label: 'الشروق', value: 'الشروق' },
-                        { key: 'مكرم', label: 'مكرم', value: 'مكرم' },
-                        { key: 'مدينتي', label: 'مدينتي', value: 'مدينتي' }
-
-                    ]}
+                    show_rooms[user.user_metadata.branch]
+                }
                 />
                 <Select name='sales_man' label="إسام البائع" required={true} options={
                     [

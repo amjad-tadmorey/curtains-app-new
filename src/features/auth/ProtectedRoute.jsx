@@ -6,7 +6,6 @@ import Spinner from "../../ui/Spinner";
 export default function ProtectedRoute({ children }) {
     const { user, isLoading } = useAuth();
     if (isLoading) return <Spinner />
-    console.log(user?.user_metadata);
 
     if (!user) {
         return <Login />;

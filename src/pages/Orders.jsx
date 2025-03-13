@@ -15,10 +15,8 @@ export default function Orders() {
     const [endDate, setEndDate] = useState(new Date("2026-01-01").toISOString().split("T")[0]);
     const [searchTerm, setSearchTerm] = useState("");
 
-
-    const [editId, setEditId] = useState(null)
     const queryClient = useQueryClient()
-    const { orders, isLoading } = useOrders()
+    const { orders, isLoading: isLoadingOrders } = useOrders()
     const { changeStatus, isChanging } = useChangeStatus()
 
     const columns = [
@@ -31,26 +29,26 @@ export default function Orders() {
         { header: "Delivery Date", accessor: "delivery_date", isSortable: true },
         { header: "Sales man", accessor: "sales_man", isSortable: true },
         { header: "Show room", accessor: "show_room", isSortable: true },
+        { header: "Branch", accessor: "branch", isSortable: true },
         { header: "Status", accessor: "status", isSortable: true },
         // { header: "View", accessor: "", isSortable: false },
     ];
 
     const rowStates = ["in-progress", "completed", "closed", "returned"];
 
-    if (isLoading) return <Spinner />
+    if (isLoadingOrders) return <Spinner />
 
 
 
-    function onRowStateChange(rowIndex, newState) {
-        changeStatus({ rowIndex, newState }, {
+    function onRowStateChange(data) {
+        const { rowId, state } = data
+
+        changeStatus({ rowIndex: rowId, newState: state }, {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: [`orders`] })
             }
         });
 
-    }
-    function onRowEdit(id) {
-        setEditId(id);
     }
 
     const sortedOrders = orders
@@ -88,10 +86,9 @@ export default function Orders() {
                 columns={columns}
                 data={sortedOrders}
                 rowStates={rowStates}
-                rowsPerPage={20} // Customize pagination
+                rowsPerPage={15} // Customize pagination
                 view="/orders/{id}" // ✅ Pass view URL pattern
                 onRowStateChange={onRowStateChange}
-                onRowEdit={onRowEdit}
             />
         </div>
     )

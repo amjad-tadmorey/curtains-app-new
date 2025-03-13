@@ -1,14 +1,12 @@
 import { Controller } from 'react-hook-form'
 import Input from '../../ui/Input'
 import Select from '../../ui/Select'
-import MultipleInputs from '../../ui/MultipleInputs'
 import { useEffect } from 'react';
-import MultipleLabeledInputs from '../../ui/MultipleLabeledInputs';
 
 export default function Products({ methods, products, oldOrder }) {
     const watchedProducts = methods.watch("products");
     useEffect(() => {
-        console.log("Form changed, current products:", watchedProducts);
+        // console.log("Form changed, current products:", watchedProducts);
     }, [watchedProducts]);
     const handleAddProduct = () => {
         const currentProducts = methods.getValues('products') || [];
@@ -20,7 +18,6 @@ export default function Products({ methods, products, oldOrder }) {
         const updatedProducts = currentProducts.filter((_, i) => i !== index);
         methods.setValue('products', updatedProducts);
     };
-    console.log(watchedProducts);
 
 
     return (

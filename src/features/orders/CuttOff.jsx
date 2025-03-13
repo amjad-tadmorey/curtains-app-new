@@ -1,8 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 
-export default function CutOff({ methods, products, editSession }) {
-    console.log(editSession);
+export default function CutOff({ methods, products }) {
 
     const { register, unregister } = methods;
     const [fields, setFields] = useState([]);
