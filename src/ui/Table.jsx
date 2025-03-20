@@ -1,27 +1,41 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { FaEllipsisV, FaEye, FaSort, FaSortUp, FaSortDown, FaEdit } from "react-icons/fa";
+import { FaEllipsisV, FaEye, FaSort, FaSortUp, FaSortDown, FaPrint } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Spinner from "./Spinner";
 import MiniSpinner from "./MiniSpinner";
 
 const Table = ({
+    name,
     columns,
     data,
+    actions,
     rowStates,
     onRowStateChange,
-    onRowEdit,
     menuIcon = <FaEllipsisV />,
     shadow = "shadow-lg",
     rowsPerPage = 5,
     view,
-    enableEdit = false,
+    print,
 }) => {
-    const [sortConfig, setSortConfig] = useState({ key: "", direction: null });
+    const [sortConfig, setSortConfig] = useState(() => {
+        const savedSort = localStorage.getItem(`${name}-tableSortConfig`);
+        return savedSort ? JSON.parse(savedSort) : { key: "", direction: null };
+    });
+    const [filters, setFilters] = useState(() => {
+        const savedFilters = localStorage.getItem(`${name}-tableFilters`);
+        return savedFilters ? JSON.parse(savedFilters) : {};
+    });
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [filters, setFilters] = useState({});
     const [loadingRowId, setLoadingRowId] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        localStorage.setItem(`${name}-tableSortConfig`, JSON.stringify(sortConfig));
+    }, [sortConfig]);
+
+    useEffect(() => {
+        localStorage.setItem(`${name}-tableFilters`, JSON.stringify(filters));
+    }, [filters]);
 
     const handleSort = (key) => {
         let direction = "asc";
@@ -70,7 +84,7 @@ const Table = ({
     };
 
     const getViewUrl = (row) => (view ? view.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#");
-
+    const getPrintUrl = (row) => (print ? print.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#");
 
     const handleRowStateChange = async (rowId, state) => {
         setLoadingRowId(rowId);
@@ -95,14 +109,11 @@ const Table = ({
         }
     };
 
-
-
     return (
         <div className={`overflow-x-auto ${shadow} rounded-lg`}>
             <table className="min-w-full border-collapse bg-white rounded-lg">
                 <thead className="bg-gray-100 text-gray-600">
                     <tr className="text-sm">
-                        {enableEdit && <th className="py-2 px-6 text-center">Edit</th>}
                         {columns.map((column, index) => (
                             <th key={`${column.header}-${index}`} className="py-2 px-6 text-left font-medium relative">
                                 <div className="flex items-center justify-between cursor-pointer" onClick={() => column.isSortable && handleSort(column.accessor)}>
@@ -124,21 +135,16 @@ const Table = ({
                                     ))}
                                 </select>
                             </th>
+
                         ))}
                         {view && <th className="py-2 px-6 text-center">View</th>}
-                        <th className="py-2 px-6">Actions</th>
+                        {print && <th className="py-2 px-6 text-center">Print</th>}
+                        {actions && <th className="py-2 px-6 text-center">Actions</th>}
                     </tr>
                 </thead>
                 <tbody>
                     {currentRows.map((row) => (
                         <tr key={row.id} className="text-sm text-gray-700 hover:bg-gray-200">
-                            {enableEdit && (
-                                <td className="py-4 px-6 text-center border-t border-gray-300">
-                                    <button className="text-yellow-600 hover:text-yellow-800" onClick={() => onRowEdit(row.id)}>
-                                        <FaEdit />
-                                    </button>
-                                </td>
-                            )}
                             {
                                 columns.map((column) => {
                                     const cellValue = row[column.accessor];
@@ -158,23 +164,32 @@ const Table = ({
                                     </button>
                                 </td>
                             )}
-                            <td className="py-4 px-6 text-center border-t border-gray-300 relative">
-                                <button className="text-gray-600 hover:text-blue-600" onClick={() => setOpenMenuIndex(openMenuIndex === row.id ? null : row.id)}>
-                                    {menuIcon}
-                                </button>
-                                {openMenuIndex === row.id && (
-                                    <div className="absolute bg-white border rounded-lg shadow-md mt-1 right-0 w-40 z-10 h-44 flex justify-center items-center flex-col">
-                                        {
-                                            loadingRowId !== null ? <MiniSpinner /> :
-                                                rowStates.map((state) => (
-                                                    <button key={state} className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100" onClick={() => handleRowStateChange(row.id, state)}>
-                                                        {state}
-                                                    </button>
-                                                ))
-                                        }
-                                    </div>
-                                )}
-                            </td>
+                            {print && (
+                                <td className="py-4 px-6 text-center border-t border-gray-300">
+                                    <button className="text-blue-600 hover:text-blue-800" onClick={() => navigate(getPrintUrl(row))}>
+                                        <FaPrint />
+                                    </button>
+                                </td>
+                            )}
+                            {
+                                actions && <td className="py-4 px-6 text-center border-t border-gray-300 relative">
+                                    <button className="text-gray-600 hover:text-blue-600" onClick={() => setOpenMenuIndex(openMenuIndex === row.id ? null : row.id)}>
+                                        {menuIcon}
+                                    </button>
+                                    {openMenuIndex === row.id && (
+                                        <div className="absolute bg-white border rounded-lg shadow-md mt-1 right-0 w-40 z-10 h-44 flex justify-center items-center flex-col">
+                                            {
+                                                loadingRowId !== null ? <MiniSpinner /> :
+                                                    rowStates.map((state) => (
+                                                        <button key={state} className="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100" onClick={() => handleRowStateChange(row.id, state)}>
+                                                            {state}
+                                                        </button>
+                                                    ))
+                                            }
+                                        </div>
+                                    )}
+                                </td>
+                            }
                         </tr>
                     ))}
                 </tbody>
@@ -212,10 +227,3 @@ const Table = ({
 };
 
 export default Table;
-
-
-
-
-
-
-

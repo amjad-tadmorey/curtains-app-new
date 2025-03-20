@@ -10,91 +10,19 @@ import CuttOff from './CuttOff'
 import Button from '../../ui/Button'
 import toast from 'react-hot-toast'
 import Spinner from '../../ui/Spinner'
-import { useOrderById } from './useOrderById'
+import { compareRoomQuantities, validateProducts } from '../../utils/helpers'
 
 
-export default function AddOrderForm({ close, edit }) {
+export default function AddOrderForm({ close }) {
     const { user: { user_metadata: { branch }, isLoading: isLoadingAuth } } = useAuth()
-
-    const [editSession, setEditSession] = useState(false)
-    useEffect(() => {
-        if (edit) setEditSession(true)
-        if (!edit) setEditSession(false)
-    }, [edit])
-
-
     const { products, isLoading: isLoadingProducts } = useProducts()
-    const { order, isLoading: isLoadingOrder } = useOrderById(edit || 0)
     const { addOrder, isAdding } = useAddOrder()
+
     const methods = useForm();
     useEffect(() => {
     }, [methods.watch()]);
-
-    function compareRoomQuantities(products, rooms, cuttoffMaterials = []) {
-        const productQuantities = {};
-        const usedQuantities = {};
-        const errors = [];
-
-        // Store total product quantities from the main products list
-        products.forEach(({ product, quantity }) => {
-            productQuantities[product] = parseFloat(quantity) || 0;
-        });
-
-        // Store total quantities used in rooms
-        rooms?.forEach((room) => {
-            Object.keys(room).forEach(field => {
-                if (!Array.isArray(room[field])) return; // Ensure it's an array before looping
-                room[field].forEach(({ product, quantity }) => {
-                    if (!product) return;
-                    const roomQuantity = parseFloat(quantity) || 0;
-                    usedQuantities[product] = (usedQuantities[product] || 0) + roomQuantity;
-                });
-            });
-        });
-
-        // Store total quantities used in cuttoff materials (if any)
-        if (Array.isArray(cuttoffMaterials)) {
-            cuttoffMaterials.forEach(({ product, quantity }) => {
-                if (!product) return;
-                const cutoffQuantity = parseFloat(quantity) || 0;
-                usedQuantities[product] = (usedQuantities[product] || 0) + cutoffQuantity;
-            });
-        }
-
-        // Compare the total quantities
-        Object.keys(productQuantities).forEach(product => {
-            const available = productQuantities[product];
-            const used = usedQuantities[product] || 0;
-
-            if (used.toFixed(2) > available.toFixed(2)) {
-                errors.push(`🚨 لا يمكن استهلاك كميات اكبر من الكمية المطلوبة للمنتج \n(${product.split(" || ")[0]}" تم استهلاك: ${used.toFixed(2)}, الكمية المطلوبة: ${(available).toFixed(2)}) \n ________________________________________________________________`);
-            } else if (used < available) {
-                errors.push(`⚠ لا يمكن إنشاء الأوردر مع وجود منتجات لم يتم استهلاك كميتها بالكامل \n (${product.split(" || ")[0]}" تم استهلاك: ${used.toFixed(2)}, المتاح: ${(available - used).toFixed(2)}) \n ______________________________________________________________`);
-            }
-        });
-
-        return {
-            isValid: errors.length === 0,  // Returns true if no errors
-            errors,
-        };
-    }
-
-    function validateProducts(rooms, products) {
-        const requiredProduct = "مجر ويفي || 270-10-0003-01-00002 || 418 || rails";
-
-        // Check if any fabric has type "ويفي"
-        const hasWeaveFabric = rooms.some(room =>
-            room.fabrics.some(fabric => fabric.type === "ويفي")
-        );
-
-        // If there is a "ويفي" fabric, check if the required product exists in products
-        if (hasWeaveFabric) {
-            return products.some(product => product.product === requiredProduct);
-        }
-
-        return true;
-    }
-
+    console.log(methods.getValues());
+    
     function onSubmit(orderData) {
         if (orderData.order_type === 'خياطة' && orderData.rooms === undefined) return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
         if (orderData.order_type === "خام") {
@@ -127,14 +55,14 @@ export default function AddOrderForm({ close, edit }) {
     }
 
 
-    if (isLoadingProducts || isLoadingOrder || isLoadingAuth) return <Spinner />
+    if (isLoadingProducts || isLoadingAuth) return <Spinner />
     return (
-        <div dir='rtl' className='min-w-[95vw] h-[80vh] overflow-y-scroll px-8'>
-            <h1 className='mb-8 border-b border-dark w-fit pr-12 pb-2 font-bold text-2xl'>Add Order</h1>
+        <div dir='rtl' className='min-w-[95vw] h-[90vh] overflow-y-scroll px-8'>
+            <h1 className='mb-8 border-b border-dark w-fit pl-12 pb-2 font-bold text-2xl'>إضافة أوردر</h1>
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)} className='px-4'>
                     {/* Genral Info */}
-                    <GeneralInfo editSession={editSession} />
+                    <GeneralInfo />
 
                     {/* Products Selection */}
                     <Products methods={methods} products={products} />

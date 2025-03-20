@@ -12,6 +12,13 @@ function DateFilter({ setStartDate, setEndDate, startDate, endDate }) {
         if (savedEndDate) setEndDate(savedEndDate);
     }, [setStartDate, setEndDate]);
 
+    const clearDates = () => {
+        setStartDate("");
+        setEndDate("");
+        localStorage.removeItem('startDate');
+        localStorage.removeItem('endDate');
+    };
+
     return (
         <div className='flex items-center gap-6'>
             <div className='flex items-center gap-4 flex-1'>
@@ -39,6 +46,12 @@ function DateFilter({ setStartDate, setEndDate, startDate, endDate }) {
                         type="date"
                     />
                 </label>
+                <button
+                    className="px-4 py-2 bg-dark text-white rounded-lg hover:bg-dark-hover cursor-pointer"
+                    onClick={clearDates}
+                >
+                    Clear
+                </button>
             </div>
         </div>
     );

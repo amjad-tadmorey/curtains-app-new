@@ -52,6 +52,12 @@ html {
   font-size: 75%;
 }
 
+@media (max-width: 500px) {
+  html {
+    font-size: 50%;
+  }
+}
+
 .room-container {
   /* page-break-before: c; */
   page-break-inside: avoid;
@@ -108,6 +114,18 @@ html {
 }
 
 .status-closed {
+  /* background-color: var(--color-success); */
+  color: var(--color-dark);
+  font-weight: bold;
+}
+
+.status-active {
+  /* background-color: var(--color-success); */
+  color: var(--color-green);
+  font-weight: bold;
+}
+
+.status-in-active {
   /* background-color: var(--color-success); */
   color: var(--color-dark);
   font-weight: bold;

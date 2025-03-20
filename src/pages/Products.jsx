@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import Table from '../ui/Table';
@@ -7,7 +7,8 @@ import Spinner from '../ui/Spinner';
 
 export default function Products() {
 
-    const { products, isLoading } = useProducts()
+    const { products: productsApi, isLoading } = useProducts()
+    const [searchTerm, setSearchTerm] = useState("");
 
     const columns = [
         { header: "ID", accessor: "sapID", isSortable: true },
@@ -21,10 +22,20 @@ export default function Products() {
 
     if (isLoading) return <Spinner />
 
+    const products = productsApi
+        .filter(item => !searchTerm || Object.values(item).some(value => String(value).toLowerCase().includes(searchTerm.toLowerCase())))
+
     return (
         <div className="p-12">
             <div className="mb-12">
-                <div className="ml-auto w-fit">
+                <div className="ml-auto w-full flex items-center gap-12 justify-between">
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Search..."
+                        className="w-64 text-2xl border border-gray-300 px-4 py-2 rounded-lg flex-1"
+                    />
                     <Modal>
                         <Modal.Open>
                             <Button >Add Product +</Button>
@@ -35,6 +46,7 @@ export default function Products() {
                 </div>
             </div>
             <Table
+                name={'products'}
                 columns={columns}
                 data={products}
                 rowStates={rowStates}

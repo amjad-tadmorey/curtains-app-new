@@ -16,7 +16,7 @@ export default function Orders() {
     const [searchTerm, setSearchTerm] = useState("");
 
     const queryClient = useQueryClient()
-    const { orders, isLoading: isLoadingOrders } = useOrders()
+    const { orders: ordersApi, isLoading: isLoadingOrders } = useOrders()
     const { changeStatus, isChanging } = useChangeStatus()
 
     const columns = [
@@ -51,7 +51,7 @@ export default function Orders() {
 
     }
 
-    const sortedOrders = orders
+    const orders = ordersApi
         .map(o => ({ ...o, created_at: formatDate(o.created_at) })) // Create a new object with "created_at" set
         .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date))
         .filter(item => (!startDate || new Date(item.delivery_date) >= new Date(startDate)) && (!endDate || new Date(item.delivery_date) <= new Date(endDate)))
@@ -62,13 +62,13 @@ export default function Orders() {
     return (
         <div className="p-12">
             <div className="mb-12">
-                <div className="w-full flex items-center gap-12">
+                <div className="w-full flex items-center gap-12 flex-col-reverse lg:flex-row">
                     <input
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search..."
-                        className="w-64 text-2xl border border-gray-300 px-4 py-2 rounded-lg flex-1"
+                        className="lg:w-64 text-2xl border border-gray-300 px-4 py-2 rounded-lg flex-1 w-full"
                     />
                     <DateFilter setStartDate={setStartDate} setEndDate={setEndDate} startDate={startDate} endDate={endDate} />
                     <Modal>
@@ -83,11 +83,14 @@ export default function Orders() {
                 </div>
             </div>
             <Table
+                name={'orders'}
                 columns={columns}
-                data={sortedOrders}
+                data={orders}
                 rowStates={rowStates}
+                actions={true}
                 rowsPerPage={15} // Customize pagination
-                view="/orders/{id}" // ✅ Pass view URL pattern
+                // view="/orders/view/{id}" // ✅ Pass view URL pattern
+                print="/orders/print/{id}" // ✅ Pass view URL pattern
                 onRowStateChange={onRowStateChange}
             />
         </div>

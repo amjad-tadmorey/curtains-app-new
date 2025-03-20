@@ -16,8 +16,6 @@ export default function Rooms({ methods }) {
     const [isWindowPickerOpen, setIsWindowPickerOpen] = useState(false);
     const { productsTypeOptions: typeOptions, windows: windowShapes } = useReference()
 
-    console.log(windowShapes);
-    console.log(typeOptions);
 
     useEffect(() => {
         // console.log("Form changed, current rooms:", watchedRooms);
@@ -60,6 +58,7 @@ export default function Rooms({ methods }) {
         }
     };
 
+
     return (
         <div className="pb-4 border-b border-gray-300">
             <h2 className="text-xl font-bold mb-4">الغرف : </h2>
@@ -69,7 +68,7 @@ export default function Rooms({ methods }) {
 
                         <div className="absolute top-2 right-2 p-4 flex items-end gap-6">
                             <Input equired={true} name={`rooms[${roomIndex}].room_name`} label="إسم الغرفة" type="text" />
-                            <button type="button" onClick={() => handleDeleteRoom(roomIndex)} className="text-danger text-sm mb-2 cursor-pointer text-nowrap">حذف الغرفة  </button>
+                            <button type="button" onClick={() => handleDeleteRoom(roomIndex)} className="text-danger text-lg mb-2 cursor-pointer text-nowrap">حذف الغرفة  </button>
                         </div>
 
                         {/* Materials Section */}

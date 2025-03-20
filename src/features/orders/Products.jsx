@@ -3,7 +3,7 @@ import Input from '../../ui/Input'
 import Select from '../../ui/Select'
 import { useEffect } from 'react';
 
-export default function Products({ methods, products, oldOrder }) {
+export default function Products({ methods, products }) {
     const watchedProducts = methods.watch("products");
     useEffect(() => {
         // console.log("Form changed, current products:", watchedProducts);
@@ -13,12 +13,26 @@ export default function Products({ methods, products, oldOrder }) {
         methods.setValue('products', [...currentProducts, { product: '', quantity: null }]);
     };
 
-    const handleDeleteProduct = (index) => {
-        const currentProducts = methods.getValues('products') || [];
-        const updatedProducts = currentProducts.filter((_, i) => i !== index);
-        methods.setValue('products', updatedProducts);
-    };
+    const handleDeleteProduct = (index, globalProducts) => {
+        const currentProducts = [...(methods.getValues('products') ?? [])];
 
+        if (index < 0 || index >= currentProducts.length) return;
+
+        const productToDelete = currentProducts[index];
+        const existsInGlobal = globalProducts?.some(group =>
+            Object.values(group)?.some(category =>
+                Array.isArray(category) && category?.some(item => item.product === productToDelete.product)
+            )
+        );
+
+        if (existsInGlobal) {
+            alert("🚨 لا يمكن حذف منتج تم استخدامه في إحدى الغرف \n برجاء حذف المنتج من الغرفة ثم حذفه من القائمة الرئيسية!");
+            return;
+        }
+
+        currentProducts.splice(index, 1);
+        methods.setValue('products', currentProducts);
+    };
 
     return (
         <>
@@ -50,7 +64,7 @@ export default function Products({ methods, products, oldOrder }) {
                                     />
                                     <button
                                         type="button"
-                                        onClick={() => handleDeleteProduct(index)}
+                                        onClick={() => handleDeleteProduct(index, methods.getValues().rooms)}
                                         className="px-3 py-1 bg-dark text-white rounded-md hover:bg-dark-hover transition-all cursor-pointer"
                                     >
                                         x

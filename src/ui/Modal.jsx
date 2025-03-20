@@ -11,9 +11,9 @@ const Modal = ({ children, overlayType = "blur", overlayColor = "rgba(0, 0, 0, 0
 
     const overlayStyles = overlayType === "blur" ? "backdrop-blur-sm" : `bg-${overlayColor}`;
 
-    const handleOuterClick = (e) => {
-        if (e.target.classList.contains("modal-overlay")) close();
-    };
+    // const handleOuterClick = (e) => {
+    //     if (e.target.classList.contains("modal-overlay")) close();
+    // };
 
     return (
         <ModalContext.Provider value={{ openName, close, open }}>
@@ -21,7 +21,7 @@ const Modal = ({ children, overlayType = "blur", overlayColor = "rgba(0, 0, 0, 0
             {openName && (
                 <div
                     className={`fixed h-screen w-screen inset-0 z-50 ${overlayStyles} transition-all modal-overlay`}
-                    onClick={handleOuterClick}
+                // onClick={handleOuterClick}
                 >
                     <div className="absolute inset-0 z-40 modal-overlay"></div>
                 </div>

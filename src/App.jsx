@@ -3,7 +3,6 @@ import Orders from "./pages/Orders";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast"
-import OrderView from "./pages/OrderView";
 import AppLayout from "./ui/AppLayout";
 import Accounts from "./pages/Accounts";
 import Products from "./pages/Products";
@@ -11,6 +10,10 @@ import ProductView from "./pages/ProductView";
 import Login from "./pages/Login";
 import PageNotFound from "./pages/PageNotFound";
 import ProtectedRoute from "./features/auth/ProtectedRoute";
+import OrderPrint from "./pages/OrderPrint";
+import OrderView from "./pages/OrderView";
+import MyAccount from "./pages/MyAccount";
+import AdminRoute from "./features/auth/AdminRoute";
 
 function App() {
   const queryClient = new QueryClient({
@@ -57,10 +60,12 @@ function App() {
         >
           <Route index element={<Orders />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="orders/:orderId" element={<OrderView />} />
-          <Route path="products" element={<Products />} />
+          <Route path="orders/view/:orderId" element={<OrderView />} />
+          <Route path="orders/print/:orderId" element={<OrderPrint />} />
+          <Route path="products" element={<AdminRoute><Products /></AdminRoute>} />
           <Route path="products/:productId" element={<ProductView />} />
-          <Route path="accounts" element={<Accounts />} />
+          <Route path="my-account" element={<MyAccount />} />
+          <Route path="accounts" element={<AdminRoute><Accounts /></AdminRoute>} />
           <Route path="login" element={<Login />} />
           <Route path="*" element={<PageNotFound />} />
         </Route>
