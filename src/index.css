@@ -89,31 +89,31 @@ html {
   --color-yellow: #FFD700 !important;
 }
 
-.status-pending {
+.status-قيد-الانتظار {
   /* background-color: var(--color-success); */
   color: var(--color-yellow);
   font-weight: bold;
 }
 
-.status-in-progress {
+.status-جاري {
   /* background-color: var(--color-success); */
   color: var(--color-blue);
   font-weight: bold;
 }
 
-.status-completed {
+.status-تم-الاستلام {
   /* background-color: var(--color-success); */
   color: var(--color-green);
   font-weight: bold;
 }
 
-.status-returned {
+.status-مرتجع {
   /* background-color: var(--color-success); */
   color: var(--color-red);
   font-weight: bold;
 }
 
-.status-closed {
+.status-مقفل {
   /* background-color: var(--color-success); */
   color: var(--color-dark);
   font-weight: bold;

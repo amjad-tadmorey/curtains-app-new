@@ -88,8 +88,28 @@ export default function Accounts() {
     };
 
 
+    const updateInProgressOrders = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+            .from("orders")
+            .update({ status: "قيد الانتظار" })
+            .eq("status", "pending");
+
+        if (error) {
+            console.error("Error updating orders:", error.message);
+        } else {
+            console.log("Orders updated successfully:", data);
+        }
+        setLoading(false);
+    };
+
+
+
     return (
         <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <button onClick={updateInProgressOrders} disabled={loading}>
+                {loading ? "Updating..." : "Update Orders"}
+            </button>
             <h1 className="text-2xl font-bold mb-4">Create Account</h1>
 
             {message && <p className={`text-center ${message.startsWith("✅") ? "text-green-600" : "text-red-600"}`}>{message}</p>}

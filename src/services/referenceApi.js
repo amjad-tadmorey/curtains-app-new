@@ -1,6 +1,6 @@
 import supabase from "./supabase";
 
-export async function getProductsTypeOptions() {
+export async function getReference() {
     const { data, error } = await supabase
         .from('reference')
         .select("*")

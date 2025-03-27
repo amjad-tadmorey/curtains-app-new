@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import Table from '../ui/Table';
@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import Spinner from '../ui/Spinner';
 import { formatDate } from '../utils/helpers';
 import DateFilter from '../ui/DateFilter';
+import supabase from '../services/supabase';
 
 export default function Orders() {
     const [startDate, setStartDate] = useState(new Date("2025-01-01").toISOString().split("T")[0]);
@@ -34,7 +35,7 @@ export default function Orders() {
         // { header: "View", accessor: "", isSortable: false },
     ];
 
-    const rowStates = ["in-progress", "completed", "closed", "returned"];
+    const rowStates = ["قيد الانتظار", "جاري", "تم الاستلام", "مقفل", "مرتجع"];
 
     if (isLoadingOrders) return <Spinner />
 
@@ -42,7 +43,6 @@ export default function Orders() {
 
     function onRowStateChange(data) {
         const { rowId, state } = data
-
         changeStatus({ rowIndex: rowId, newState: state }, {
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: [`orders`] })
@@ -52,17 +52,38 @@ export default function Orders() {
     }
 
     const orders = ordersApi
-        .map(o => ({ ...o, created_at: formatDate(o.created_at) })) // Create a new object with "created_at" set
+        .map(o => ({ ...o, created_at: formatDate(o.created_at) }))
         .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date))
         .filter(item => (!startDate || new Date(item.delivery_date) >= new Date(startDate)) && (!endDate || new Date(item.delivery_date) <= new Date(endDate)))
-        .filter(item => !searchTerm || Object.values(item).some(value => String(value).toLowerCase().includes(searchTerm.toLowerCase())))
+        .filter(item =>
+            !searchTerm ||
+            [item.customer_name, item.phone_number].some(value =>
+                String(value).toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        )
 
+    let ordersTotal = ordersApi
+        .map(o => ({ ...o, created_at: formatDate(o.created_at) }))
+        .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date))
+        .filter(item => (!startDate || new Date(item.delivery_date) >= new Date(startDate)) && (!endDate || new Date(item.delivery_date) <= new Date(endDate)))
+        .filter(item =>
+            !searchTerm ||
+            [item.customer_name, item.phone_number].some(value =>
+                String(value).toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        ).length;
+
+
+    console.log(ordersTotal);
 
 
     return (
         <div className="p-12">
             <div className="mb-12">
                 <div className="w-full flex items-center gap-12 flex-col-reverse lg:flex-row">
+                    <div dir='rtl' className='p-6 shadow-lg rounded-lg'>
+                        <h1 className='font-bold text-xl'>مجموع الأوردرات :  {orders.length}</h1>
+                    </div>
                     <input
                         type="text"
                         value={searchTerm}
@@ -88,8 +109,7 @@ export default function Orders() {
                 data={orders}
                 rowStates={rowStates}
                 actions={true}
-                rowsPerPage={15} // Customize pagination
-                // view="/orders/view/{id}" // ✅ Pass view URL pattern
+                rowsPerPage={99999999999999999999} // Customize pagination
                 print="/orders/print/{id}" // ✅ Pass view URL pattern
                 onRowStateChange={onRowStateChange}
             />

@@ -11,10 +11,12 @@ import { FiFileText } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../ui/Spinner";
 import { RiVipLine } from "react-icons/ri";
+import { useAuth } from "../context/AuthContext";
 
 
 
 export default function OrderPrint() {
+    const { user, isLoading } = useAuth()
     const navigate = useNavigate()
     useEffect(() => {
         document.addEventListener("keydown", function (event) {
@@ -29,7 +31,12 @@ export default function OrderPrint() {
     const queryClient = useQueryClient()
     const pdfRef = useRef();
     const { order, isLoadingOrder } = useOrderById();
+
+
     const handlePrint = () => {
+
+        // window.location.reload()
+
         if (!pdfRef.current) return;
 
         html2pdf()
@@ -63,7 +70,7 @@ export default function OrderPrint() {
         queryClient.invalidateQueries({ queryKey: [`order-${order?.id}`] })
     }, [order])
 
-    if (isLoadingOrder) return <Spinner />;
+    if (isLoadingOrder || isLoading) return <Spinner />;
 
     function formatRailsQuantities(orderData) {
         const grouped = {};
@@ -98,18 +105,19 @@ export default function OrderPrint() {
         }));
     }
 
+
     return (
         <div dir="rtl" className="flex flex-col items-center p-6">
             {/* 🖨️ Print Button */}
             <button
                 onClick={() => {
-                    if (order.status !== 'pending') {
+                    if (order.status !== 'قيد الانتظار' && user.user_metadata.role !== 'admin') {
                         alert(`لا يمكن حفظ الاوردر بعد تحويله من قيد الانتظار ل ${order.status} !`)
                     } else {
                         handlePrint()
                     }
                 }}
-                className={`mb-4 px-4 py-1 ${order.status == 'pending' ? 'bg-blue-600 hover:bg-blue-700' : order.status !== 'pending' ? 'bg-dark hover:bg-dark-hover' : ''} text-white rounded-md shadow-md `}
+                className={`mb-4 px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-md `}
             >
                 حفظ الطلب 📄
             </button>
@@ -426,17 +434,17 @@ export default function OrderPrint() {
                                             {room?.windows?.map((window, i) => (
                                                 <div key={i} className="p-4 border rounded flex w-full">
                                                     <div className="relative w-1/2">
-                                                        <p className="absolute left-24 translate-x-1/2 -top-3">{window.width ? `${window.width} ` : "—"}</p>
+                                                        <p className="absolute left-28 translate-x-1/2 -top-3">{window.width ? `${window.width}` : "—"}</p>
                                                         <img
                                                             src={window.src || "/default-image.jpg"}
                                                             alt="Window"
                                                             className="w-24 h-24 object-contain mt-4"
                                                             style={{ border: "1px solid #ddd" }}
                                                         />
-                                                        <p className="absolute left-10 bottom-1/2 translate-y-1/2">{window.height ? `${window.height} ` : "—"}</p>
+                                                        <p className="absolute left-12 bottom-1/2 translate-y-1/2">{window.height ? `${window.height}` : "—"}</p>
+                                                        <p className=" absolute left-12 bottom-1">{window.type || "—"}</p>
                                                     </div>
                                                     <p className="font-bold w-1/2">{window.note || "—"}</p>
-                                                    <p>{window.type || "—"}</p>
                                                 </div>
                                             ))}
                                         </div>

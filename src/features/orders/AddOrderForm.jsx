@@ -21,16 +21,15 @@ export default function AddOrderForm({ close }) {
     const methods = useForm();
     useEffect(() => {
     }, [methods.watch()]);
-    console.log(methods.getValues());
-    
+
     function onSubmit(orderData) {
         if (orderData.order_type === 'خياطة' && orderData.rooms === undefined) return alert('🚨 يجب اضافة غرفة واحدة على الاقل في نوع الاوردر (خياطة)')
         if (orderData.order_type === "خام") {
-            addOrder({ ...orderData, status: 'pending', branch }, {
+            addOrder({ ...orderData, status: 'قيد الانتظار', branch }, {
                 onSuccess: () => {
                     close()
                     methods.reset()
-                    toast.success('The Order Successfuly Add ✔!')
+                    toast.success('The Order Successfuly Added ✔!')
                 }
             });
         } else {
@@ -44,7 +43,7 @@ export default function AddOrderForm({ close }) {
                 alert(result.errors.join("\n"));  // Show errors in an alert
                 return; // Stop form submission if invalid
             }
-            addOrder({ ...orderData, status: 'pending', branch }, {
+            addOrder({ ...orderData, status: 'قيد الانتظار', branch }, {
                 onSuccess: () => {
                     close()
                     methods.reset()

@@ -4,21 +4,25 @@ import Select from '../../ui/Select'
 import { useEffect } from 'react';
 
 export default function Products({ methods, products }) {
-    const watchedProducts = methods.watch("products");
+    const watchedProducts = methods.watch("products", [{ product: '2202 كتان فرنسي || 270-10-0001-16-00112 || 247 || fabrics', quantity: 10 }]);
     useEffect(() => {
         // console.log("Form changed, current products:", watchedProducts);
     }, [watchedProducts]);
+    console.log(methods.getValues('products'));
     const handleAddProduct = () => {
         const currentProducts = methods.getValues('products') || [];
-        methods.setValue('products', [...currentProducts, { product: '', quantity: null }]);
+        methods.setValue('products', [...watchedProducts, { product: '', quantity: null }]);
     };
+    console.log(watchedProducts);
 
     const handleDeleteProduct = (index, globalProducts) => {
+        console.log(index);
+
         const currentProducts = [...(methods.getValues('products') ?? [])];
 
         if (index < 0 || index >= currentProducts.length) return;
 
-        const productToDelete = currentProducts[index];
+        const productToDelete = watchedProducts[index];
         const existsInGlobal = globalProducts?.some(group =>
             Object.values(group)?.some(category =>
                 Array.isArray(category) && category?.some(item => item.product === productToDelete.product)

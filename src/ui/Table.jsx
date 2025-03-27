@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { FaEllipsisV, FaEye, FaSort, FaSortUp, FaSortDown, FaPrint } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import MiniSpinner from "./MiniSpinner";
+import { useAuth } from "../context/AuthContext";
 
 const Table = ({
     name,
@@ -16,6 +17,7 @@ const Table = ({
     view,
     print,
 }) => {
+    const { user, isLoading } = useAuth()
     const [sortConfig, setSortConfig] = useState(() => {
         const savedSort = localStorage.getItem(`${name}-tableSortConfig`);
         return savedSort ? JSON.parse(savedSort) : { key: "", direction: null };
@@ -86,7 +88,15 @@ const Table = ({
     const getViewUrl = (row) => (view ? view.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#");
     const getPrintUrl = (row) => (print ? print.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#");
 
+    function authClose() {
+        setOpenMenuIndex(null)
+        alert('ليس لديك صلاحية تغيير حالة العميل')
+    }
+
     const handleRowStateChange = async (rowId, state) => {
+        if (user.user_metadata.role !== 'admin') return authClose()
+
+
         setLoadingRowId(rowId);
         try {
             await new Promise((resolve, reject) => {
@@ -108,6 +118,18 @@ const Table = ({
         } finally {
         }
     };
+
+    useEffect(() => {
+        document.addEventListener("click", function (event) {
+            if (event.target.closest('td') === null || !event.target.closest('td').classList.contains('menu')) {
+                setOpenMenuIndex(null)
+            }
+        });
+    }, [])
+
+
+    console.log(data);
+
 
     return (
         <div className={`overflow-x-auto ${shadow} rounded-lg`}>
@@ -172,12 +194,12 @@ const Table = ({
                                 </td>
                             )}
                             {
-                                actions && <td className="py-4 px-6 text-center border-t border-gray-300 relative">
+                                actions && <td className="menu py-4 px-6 text-center border-t border-gray-300 relative">
                                     <button className="text-gray-600 hover:text-blue-600" onClick={() => setOpenMenuIndex(openMenuIndex === row.id ? null : row.id)}>
                                         {menuIcon}
                                     </button>
                                     {openMenuIndex === row.id && (
-                                        <div className="absolute bg-white border rounded-lg shadow-md mt-1 right-0 w-40 z-10 h-44 flex justify-center items-center flex-col">
+                                        <div className="menu absolute bg-white border rounded-lg shadow-md mt-1 right-0 w-40 z-10 h-44 flex justify-center items-center flex-col">
                                             {
                                                 loadingRowId !== null ? <MiniSpinner /> :
                                                     rowStates.map((state) => (

@@ -1,32 +1,42 @@
 export function formatRails(data) {
     const grouped = {};
 
-    // Group by product and count occurrences of each quantity
     data.forEach(item => {
         const product = item.product;
         const quantity = parseFloat(item.quantity);
+        const note = item.notes.trim(); // إزالة المسافات الفارغة
 
         if (!grouped[product]) {
-            grouped[product] = {};
+            grouped[product] = { quantities: {}, notes: new Set() };
         }
 
-        if (!grouped[product][quantity]) {
-            grouped[product][quantity] = 1;
+        // حفظ كميات المنتج وعدد تكراراتها
+        if (!grouped[product].quantities[quantity]) {
+            grouped[product].quantities[quantity] = 1;
         } else {
-            grouped[product][quantity] += 1;
+            grouped[product].quantities[quantity] += 1;
+        }
+
+        // إضافة الملاحظات غير الفارغة فقط
+        if (note) {
+            grouped[product].notes.add(note);
         }
     });
 
-    // Format each product's quantities for readability
-    return Object.entries(grouped).map(([product, quantities]) => {
+    return Object.entries(grouped).map(([product, { quantities, notes }]) => {
         const formattedQuantities = Object.entries(quantities)
-            .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0])) // Sort by quantity descending
+            .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0])) // ترتيب تنازلي للكميات
             .map(([quantity, count]) => `${parseFloat(quantity)} → ${count} قطع`)
             .join('\n');
 
-        return { productName: product, formattedQuantities };
+        return {
+            productName: product,
+            formattedQuantities,
+            notes: Array.from(notes).join(' | ') || null
+        };
     });
 }
+
 
 export function collectProducts(data) {
     const { cleats, fabrics, accessories } = data;

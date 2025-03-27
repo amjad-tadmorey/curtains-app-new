@@ -37,6 +37,7 @@ export default function CutOff({ methods, products }) {
                         className="border p-2 rounded w-full"
                         step="0.01"
                         min="0"
+                        max={'3'}
                     />
                     <button type="button" onClick={() => handleRemoveField(index)} className="text-red-500 cursor-pointer">×</button>
                 </div>

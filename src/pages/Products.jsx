@@ -4,6 +4,7 @@ import Button from '../ui/Button';
 import Table from '../ui/Table';
 import { useProducts } from '../features/products/useProducts';
 import Spinner from '../ui/Spinner';
+import AddProductFrom from '../features/products/AddProductFrom';
 
 export default function Products() {
 
@@ -41,6 +42,7 @@ export default function Products() {
                             <Button >Add Product +</Button>
                         </Modal.Open>
                         <Modal.Window position='top'>
+                            <AddProductFrom />
                         </Modal.Window>
                     </Modal>
                 </div>
