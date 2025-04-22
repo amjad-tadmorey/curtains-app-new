@@ -59,6 +59,7 @@ export default function Rooms({ methods }) {
     };
 
 
+
     return (
         <div className="pb-4 border-b border-gray-300">
             <h2 className="text-xl font-bold mb-4">الغرف : </h2>
@@ -83,15 +84,17 @@ export default function Rooms({ methods }) {
                             ].map((category, i) => (
                                 <div key={category.value}>
                                     <h4 className="font-medium mt-2">{category.name}</h4>
-                                    {room[category.value]?.map((_, itemIndex) => (
-                                        <div key={itemIndex} className="flex space-x-4 items-center">
+                                    {room[category.value]?.map((_, itemIndex) => {
+                                        console.log(category.value);
+                                        return <div key={itemIndex} className="flex space-x-4 items-center">
                                             <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].product`} options={watchedProducts.filter(p => category.value === 'cleats' ? p.product.split("||")[3]?.trim() === 'cleats' || p.product.split("||")[3]?.trim() === 'fabrics' : p.product.split("||")[3]?.trim() === category.value).map(p => ({ value: p.product, label: p.product.split("||")[0] }))} label="إختر منتج" />
                                             <Input required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].quantity`} label="الكمية" type="number" step="0.01" min="0" />
                                             <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].type`} options={typeOptions[i]} label="النوع" />
                                             <Input required={false} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].notes`} label="ملاحظات" type="text" />
+                                            {category.value === 'fabrics' && <Select required={true} name={`rooms[${roomIndex}].${category.value}[${itemIndex}].extra_fabrics`} options={[{ key: 'لا', label: 'لا', value: 'لا' }, { key: 'نعم', label: 'نعم', value: 'نعم' }]} label="هل تريد قص القماش الزائد" />}
                                             <button type="button" onClick={() => handleDeleteItem(roomIndex, category.value, itemIndex)} className="text-red-500 cursor-pointer">×</button>
                                         </div>
-                                    ))}
+                                    })}
                                     <button type="button" onClick={() => handleAddItem(roomIndex, category.value)} className="text-blue-500 cursor-pointer">+ أضف {category.name}</button>
                                 </div>
                             ))}
@@ -106,7 +109,11 @@ export default function Rooms({ methods }) {
                             {room?.windows?.map((win, winIndex) => (
                                 <div key={winIndex} className="flex items-center gap-4 mb-2">
                                     <img src={win.src} alt={`Window ${win.imageId}`} className="w-16 h-16 border rounded" />
-                                    <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width`} label="العرض" type="number" />
+                                    <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width`} label="عرض - 1" type="number" />
+                                    {win.imageId === 24 && <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width-2`} label="عرض - 2" type="number" />}
+                                    {win.imageId === 25 && <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width-2`} label="عرض - 2" type="number" />}
+                                    {win.imageId === 26 && <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width-2`} label="عرض - 2" type="number" />}
+                                    {win.imageId === 26 && <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].width-3`} label="عرض - 3" type="number" />}
                                     <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].height`} label="الطول" type="number" />
                                     <Input required={true} name={`rooms[${roomIndex}].windows[${winIndex}].type`} label="النوع" type="text" />
                                     <Input required={false} name={`rooms[${roomIndex}].windows[${winIndex}].note`} label="ملاحظات" type="text" />

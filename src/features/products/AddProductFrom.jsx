@@ -13,8 +13,9 @@ export default function AddProductFrom({ close }) {
     function onSubmit(data) {
         createProduct({
             ...data,
-            inStock: 0,
-            price: 0,
+            productDivisions: [0],
+            priceBeforeDiscount: 0,
+            priceAfterDiscount: 0,
             status: 'active',
         }, {
             onSuccess: () => {

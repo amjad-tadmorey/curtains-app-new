@@ -98,5 +98,22 @@ export async function updateStock(products) {
     return { state: true };
 }
 
+export async function editDivision({ id, newDiv, type }) {
+
+    const { data, error } = await supabase
+        .from('products')
+        .update({ [type]: newDiv })
+        .eq('id', id)
+        .select()
+
+    if (error) {
+        console.log(error);
+        throw new Error('product could not be updated')
+    }
+
+    return data
+
+}
+
 
 

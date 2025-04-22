@@ -15,7 +15,8 @@ export default function Products() {
         { header: "ID", accessor: "sapID", isSortable: true },
         { header: "Product name", accessor: "productName", isSortable: true },
         { header: "Product Type", accessor: "productType", isSortable: true },
-        { header: "In-stock", accessor: "inStock", isSortable: false },
+        { header: "Price Before Discount", accessor: "priceBeforeDiscount", isSortable: true },
+        { header: "Price Before Discount", accessor: "priceAfterDiscount", isSortable: true },
         { header: "Status", accessor: "status", isSortable: false },
     ];
 
@@ -24,19 +25,23 @@ export default function Products() {
     if (isLoading) return <Spinner />
 
     const products = productsApi
-        .filter(item => !searchTerm || Object.values(item).some(value => String(value).toLowerCase().includes(searchTerm.toLowerCase())))
+        .filter(item => !localStorage.getItem('searchTerm') || Object.values(item).some(value => String(value).toLowerCase().includes(localStorage.getItem('searchTerm').toLowerCase())))
 
     return (
         <div className="p-12">
             <div className="mb-12">
-                <div className="ml-auto w-full flex items-center gap-12 justify-between">
+                <div className="ml-auto w-full flex items-center gap-8 justify-between">
                     <input
                         type="text"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        value={localStorage.getItem('searchTerm')}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value)
+                            localStorage.setItem('searchTerm', e.target.value)
+                        }}
                         placeholder="Search..."
                         className="w-64 text-2xl border border-gray-300 px-4 py-2 rounded-lg flex-1"
                     />
+
                     <Modal>
                         <Modal.Open>
                             <Button >Add Product +</Button>
@@ -52,9 +57,9 @@ export default function Products() {
                 columns={columns}
                 data={products}
                 rowStates={rowStates}
-                rowsPerPage={20} // Customize pagination
+                rowsPerPage={999999999999999999} // Customize pagination
                 view="/products/{id}" // ✅ Pass view URL pattern
             />
-        </div>
+        </div >
     )
 }

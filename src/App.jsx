@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Orders from "./pages/Orders";
+import Schedule from "./pages/Schedule";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast"
@@ -10,7 +11,6 @@ import ProductView from "./pages/ProductView";
 import Login from "./pages/Login";
 import PageNotFound from "./pages/PageNotFound";
 import ProtectedRoute from "./features/auth/ProtectedRoute";
-import OrderPrint from "./pages/OrderPrint";
 import OrderView from "./pages/OrderView";
 import MyAccount from "./pages/MyAccount";
 import AdminRoute from "./features/auth/AdminRoute";
@@ -60,9 +60,9 @@ function App() {
         >
           <Route index element={<Orders />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="schedule" element={<Schedule />} />
           <Route path="orders/view/:orderId" element={<OrderView />} />
-          <Route path="orders/print/:orderId" element={<OrderPrint />} />
-          <Route path="products" element={<AdminRoute><Products /></AdminRoute>} />
+          <Route path="products" element={<Products />} />
           <Route path="products/:productId" element={<ProductView />} />
           <Route path="my-account" element={<MyAccount />} />
           <Route path="accounts" element={<AdminRoute><Accounts /></AdminRoute>} />

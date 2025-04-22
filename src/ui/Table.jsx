@@ -3,6 +3,8 @@ import { FaEllipsisV, FaEye, FaSort, FaSortUp, FaSortDown, FaPrint } from "react
 import { useNavigate } from "react-router-dom";
 import MiniSpinner from "./MiniSpinner";
 import { useAuth } from "../context/AuthContext";
+import { exportOrders, exportProductsAsCounting, exportProductsAsPrices, exportProductsAsTotals } from "../utils/helpers";
+import Button from "./Button";
 
 const Table = ({
     name,
@@ -15,8 +17,8 @@ const Table = ({
     shadow = "shadow-lg",
     rowsPerPage = 5,
     view,
-    print,
 }) => {
+    const [open, setOpen] = useState(false); // for export options
     const { user, isLoading } = useAuth()
     const [sortConfig, setSortConfig] = useState(() => {
         const savedSort = localStorage.getItem(`${name}-tableSortConfig`);
@@ -86,7 +88,7 @@ const Table = ({
     };
 
     const getViewUrl = (row) => (view ? view.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#");
-    const getPrintUrl = (row) => (print ? print.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#");
+    // const getPrintUrl = (row) => (print ? print.replace(/\{id\}/g, encodeURIComponent(row.id)) : "#");
 
     function authClose() {
         setOpenMenuIndex(null)
@@ -127,12 +129,52 @@ const Table = ({
         });
     }, [])
 
-
-    console.log(data);
-
-
     return (
         <div className={`overflow-x-auto ${shadow} rounded-lg`}>
+            <div className="flex items-center gap-4">
+                <h1 className='font-bold text-xl'>مجموع الأوردرات :  {currentRows.length}</h1>
+                {
+                    name === 'products' && <div className="flex gap-4 my-4">
+                        <Button variant='dark' onClick={() => exportProductsAsCounting(currentRows)}>Export As Counting</Button>
+                        <Button variant='dark' onClick={() => exportProductsAsTotals(currentRows)}>Export As Totals</Button>
+                        <Button variant='dark' onClick={() => exportProductsAsPrices(currentRows)}>Export As Prices</Button>
+                        {/* <div className="custom-select-wrapper">
+                            <Button variant="dark" onClick={() => setOpen(!open)} className="dropdown-toggle-button">
+                                Export Options ▾
+                            </Button>
+                            {open && (
+                                <div className="dropdown-options">
+                                    <Button
+                                        variant="light"
+                                        onClick={() => {
+                                            exportProductsAsCounting(currentRows);
+                                            setOpen(false);
+                                        }}
+                                        className="dropdown-option"
+                                    >
+                                        Export As Counting
+                                    </Button>
+                                    <Button
+                                        variant="light"
+                                        onClick={() => {
+                                            exportProductsAsPrices(currentRows);
+                                            setOpen(false);
+                                        }}
+                                        className="dropdown-option"
+                                    >
+                                        Export As Prices
+                                    </Button>
+                                </div>
+                            )}
+                        </div> */}
+                    </div>
+                }
+                {
+                    name === 'orders' && <div className="flex gap-4 my-4">
+                        <Button variant='dark' onClick={() => exportOrders(currentRows)}>Export As Orders</Button>
+                    </div>
+                }
+            </div>
             <table className="min-w-full border-collapse bg-white rounded-lg">
                 <thead className="bg-gray-100 text-gray-600">
                     <tr className="text-sm">
@@ -159,14 +201,16 @@ const Table = ({
                             </th>
 
                         ))}
-                        {view && <th className="py-2 px-6 text-center">View</th>}
-                        {print && <th className="py-2 px-6 text-center">Print</th>}
+                        {/* {view && <th className="py-2 px-6 text-center">View</th>}
+                        {print && <th className="py-2 px-6 text-center">Print</th>} */}
                         {actions && <th className="py-2 px-6 text-center">Actions</th>}
                     </tr>
                 </thead>
                 <tbody>
                     {currentRows.map((row) => (
-                        <tr key={row.id} className="text-sm text-gray-700 hover:bg-gray-200">
+                        <tr key={row.id} className="text-sm text-gray-700 hover:bg-gray-200" onDoubleClick={() => {
+                            view && navigate(getViewUrl(row))
+                        }}>
                             {
                                 columns.map((column) => {
                                     const cellValue = row[column.accessor];
@@ -179,20 +223,13 @@ const Table = ({
                                     );
                                 })
                             }
-                            {view && (
+                            {/* {view && (
                                 <td className="py-4 px-6 text-center border-t border-gray-300">
-                                    <button className="text-blue-600 hover:text-blue-800" onClick={() => navigate(getViewUrl(row))}>
+                                    <button className="text-blue-600 hover:text-blue-800" >
                                         <FaEye />
                                     </button>
                                 </td>
-                            )}
-                            {print && (
-                                <td className="py-4 px-6 text-center border-t border-gray-300">
-                                    <button className="text-blue-600 hover:text-blue-800" onClick={() => navigate(getPrintUrl(row))}>
-                                        <FaPrint />
-                                    </button>
-                                </td>
-                            )}
+                            )} */}
                             {
                                 actions && <td className="menu py-4 px-6 text-center border-t border-gray-300 relative">
                                     <button className="text-gray-600 hover:text-blue-600" onClick={() => setOpenMenuIndex(openMenuIndex === row.id ? null : row.id)}>
@@ -216,7 +253,7 @@ const Table = ({
                     ))}
                 </tbody>
             </table>
-            <div className="flex justify-end items-center mt-4 pt-4 border-t border-gray-300 bg-white">
+            {/* <div className="flex justify-end items-center mt-4 pt-4 border-t border-gray-300 bg-white">
                 <button
                     className={`px-3 py-1 text-sm font-semibold bg-[#1E293B] rounded-lg m-2 text-white cursor-pointer ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={currentPage === 1}
@@ -242,7 +279,7 @@ const Table = ({
                 >
                     Next ›
                 </button>
-            </div>
+            </div> */}
 
         </div>
     );

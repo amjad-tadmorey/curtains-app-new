@@ -14,7 +14,7 @@ import supabase from '../services/supabase';
 export default function Orders() {
     const [startDate, setStartDate] = useState(new Date("2025-01-01").toISOString().split("T")[0]);
     const [endDate, setEndDate] = useState(new Date("2026-01-01").toISOString().split("T")[0]);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
 
     const queryClient = useQueryClient()
     const { orders: ordersApi, isLoading: isLoadingOrders } = useOrders()
@@ -50,44 +50,28 @@ export default function Orders() {
         });
 
     }
-
     const orders = ordersApi
         .map(o => ({ ...o, created_at: formatDate(o.created_at) }))
         .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date))
         .filter(item => (!startDate || new Date(item.delivery_date) >= new Date(startDate)) && (!endDate || new Date(item.delivery_date) <= new Date(endDate)))
         .filter(item =>
-            !searchTerm ||
+            !localStorage.getItem('searchTerm-products') ||
             [item.customer_name, item.phone_number].some(value =>
-                String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                String(value).toLowerCase().includes(localStorage.getItem('searchTerm-products').toLowerCase())
             )
         )
-
-    let ordersTotal = ordersApi
-        .map(o => ({ ...o, created_at: formatDate(o.created_at) }))
-        .sort((a, b) => new Date(b.delivery_date) - new Date(a.delivery_date))
-        .filter(item => (!startDate || new Date(item.delivery_date) >= new Date(startDate)) && (!endDate || new Date(item.delivery_date) <= new Date(endDate)))
-        .filter(item =>
-            !searchTerm ||
-            [item.customer_name, item.phone_number].some(value =>
-                String(value).toLowerCase().includes(searchTerm.toLowerCase())
-            )
-        ).length;
-
-
-    console.log(ordersTotal);
-
 
     return (
         <div className="p-12">
             <div className="mb-12">
                 <div className="w-full flex items-center gap-12 flex-col-reverse lg:flex-row">
-                    <div dir='rtl' className='p-6 shadow-lg rounded-lg'>
-                        <h1 className='font-bold text-xl'>مجموع الأوردرات :  {orders.length}</h1>
-                    </div>
                     <input
                         type="text"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        value={localStorage.getItem('searchTerm-products')}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value)
+                            localStorage.setItem('searchTerm-products', e.target.value)
+                        }}
                         placeholder="Search..."
                         className="lg:w-64 text-2xl border border-gray-300 px-4 py-2 rounded-lg flex-1 w-full"
                     />
@@ -109,8 +93,8 @@ export default function Orders() {
                 data={orders}
                 rowStates={rowStates}
                 actions={true}
-                rowsPerPage={99999999999999999999} // Customize pagination
-                print="/orders/print/{id}" // ✅ Pass view URL pattern
+                rowsPerPage={99999999999999999999999999999999999} // Customize pagination
+                view="/orders/view/{id}" // ✅ Pass view URL pattern
                 onRowStateChange={onRowStateChange}
             />
         </div>

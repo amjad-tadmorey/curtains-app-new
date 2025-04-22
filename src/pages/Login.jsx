@@ -44,8 +44,7 @@ export default function Login() {
             setError("Login failed. Check your credentials.");
         }
     };
-    console.log(error);
-
+    
     return (
         <div className="flex flex-col items-center gap-12 p-2 lg:p-32 bg-gray-50 h-screen">
             <img src="/Logo.png" alt="" className="w-96" />
